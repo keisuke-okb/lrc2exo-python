@@ -1,0 +1,99 @@
+{
+    "GENERAL": {
+        "WIDTH": 1920,
+        "HEIGHT": 300,
+        "X_BASE_INIT": 50,
+        "Y_LYRIC": 100,
+        "Y_RUBY": 30,
+
+        "COLOR_FILL_BEFORE": [250, 250, 250, 255],
+        "COLOR_STROKE_FILL_BEFORE": [0, 0, 0, 230],
+        "COLOR_FILL_AFTER": [0, 0, 255, 255],
+        "COLOR_STROKE_FILL_AFTER": [250, 250, 250, 230],
+
+        "COLOR_FILL_BEFORE_CHORUS": [10, 10, 10, 255],
+        "COLOR_STROKE_FILL_BEFORE_CHORUS": [250, 250, 250, 255],
+        "COLOR_FILL_AFTER_CHORUS": [10, 10, 10, 255],
+        "COLOR_STROKE_FILL_AFTER_CHORUS": [250, 250, 250, 255],
+
+        "CHANGE_TO_CHORUS_STR": ["(", "（"],
+        "CHANGE_TO_MAIN_STR": [")", "）"],
+
+        "CHANGE_TO_PART_STR": ["①", "②", "①②", "④"],
+        "PART_ICON": [
+            "./images/icon_part_1.png",
+            "./images/icon_part_2.png",
+            "./images/icon_part_3.png",
+            "./images/icon_part_4.png"
+        ],
+        "PART_ICON_HEIGHT": 150,
+        "PART_ICON_OFFSET_X": -10,
+        "PART_ICON_OFFSET_Y": -10,
+        "PART_ICON_MARGIN_X": 30,
+
+        "COLOR_FILL_BEFORE_PART": [
+            [250, 250, 250, 255],
+            [250, 250, 250, 255],
+            [250, 250, 250, 255],
+            [250, 250, 250, 255]
+        ],
+        "COLOR_STROKE_FILL_BEFORE_PART": [
+            [0, 0, 0, 230],
+            [0, 0, 0, 230],
+            [0, 0, 0, 230],
+            [0, 0, 0, 230]
+        ],
+        "COLOR_FILL_AFTER_PART": [
+            [255, 0, 0, 255],
+            [0, 100, 255, 255],
+            [0, 255, 255, 255],
+            [255, 0, 255, 255]
+        ],
+        "COLOR_STROKE_FILL_AFTER_PART": [
+            [250, 250, 250, 230],
+            [250, 250, 250, 230],
+            [250, 250, 250, 230],
+            [250, 250, 250, 230]
+        ],
+
+        "DISPLAY_BEFORE_TIME": 300,
+        "DISPLAY_AFTER_TIME": 50,
+        "DISPLAY_CONNECT_THRESHOLD_TIME": 500,
+
+        "PROJECT_WIDTH": 1920,
+        "PROJECT_HEIGHT": 1080,
+        "PROJECT_FRAMERATE": 60,
+        "PROJECT_MARGIN_X": 30,
+        "PROJECT_LYRIC_X_OVERLAP_FACTOR": 1.2,
+
+        "PROJECT_Y_0_LYRIC": -240,
+        "PROJECT_Y_1_LYRIC": -20,
+        "PROJECT_Y_2_LYRIC": 200,
+        "PROJECT_Y_3_LYRIC": 420,
+
+        "PROJECT_Y_0_RUBY": -240,
+        "PROJECT_Y_1_RUBY": -20,
+        "PROJECT_Y_2_RUBY": 200,
+        "PROJECT_Y_3_RUBY": 420
+    },
+
+    "LYRIC": {
+        "FONT_PATH": "/path/to/font.ttf",
+        "FONT_SIZE": 115,
+        "STROKE_WIDTH": 12,
+        "MARGIN_SPACE": 40,
+        "MARGIN_HALF": 15,
+        "MARGIN_FULL": 30,
+        "TEXT_WIDTH_MIN": 40
+    },
+    
+    "RUBY": {
+        "FONT_PATH": "/path/to/font.ttf",
+        "FONT_SIZE": 45,
+        "STROKE_WIDTH": 12,
+        "MARGIN_SPACE": 5,
+        "MARGIN_HALF": 10,
+        "MARGIN_FULL": 24,
+        "TEXT_WIDTH_MIN": 5
+    }
+}

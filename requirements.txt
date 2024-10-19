@@ -1,0 +1,3 @@
+tqdm
+numpy<2
+pillow>9
