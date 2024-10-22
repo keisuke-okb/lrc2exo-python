@@ -1,5 +1,7 @@
 # LRC2EXO-Python
 
+![イメージ画像](./images/LRC2EXO-Python.jpg)
+
 LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕を作成するソフトウェア
 
 - ソフトウェアの利用方法は順次アップデートいたします。
