@@ -60,4 +60,6 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
 
 # カラオケ字幕作成手順、カスタマイズ方法
 
-準備中...
+## 主な設定項目
+
+![主な設定項目](./images/settings_guide.jpg)
