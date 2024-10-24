@@ -80,3 +80,78 @@ python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルの�
 ## 主な設定項目
 
 ![主な設定項目](./images/settings_guide.jpg)
+
+## 設定項目一覧（settings.json）
+
+- 字幕全般の設定
+
+| 変数名                                     | 型                                                     | 説明                                                 |
+|--------------------------------------------|--------------------------------------------------------|------------------------------------------------------|
+| `GENERAL.WIDTH`                            | int                                                    | 字幕１行分の画像幅                                   |
+| `GENERAL.HEIGHT`                           | int                                                    | 字幕１行分の画像高さ                                 |
+| `GENERAL.X_BASE_INIT`                      | int                                                    | 1文字目のデフォルトX座標（字幕１行分の画像の左上が原点） |
+| `GENERAL.Y_LYRIC`                          | int                                                    | 歌詞のY座標（字幕１行分の画像の左上が原点）           |
+| `GENERAL.Y_RUBY`                           | int                                                    | ルビのY座標（字幕１行分の画像の左上が原点）           |
+| `GENERAL.COLOR_FILL_BEFORE`                | int[R(0-255), G(0-255), B(0-255), A(0-255)]            | ワイプ前の文字色                                     |
+| `GENERAL.COLOR_STROKE_FILL_BEFORE`         | int[R(0-255), G(0-255), B(0-255), A(0-255)]            | ワイプ前の縁色                                       |
+| `GENERAL.COLOR_FILL_AFTER`                 | int[R(0-255), G(0-255), B(0-255), A(0-255)]            | ワイプ後の文字色                                     |
+| `GENERAL.COLOR_STROKE_FILL_AFTER`          | int[R(0-255), G(0-255), B(0-255), A(0-255)]            | ワイプ後の縁色                                       |
+| `GENERAL.COLOR_FILL_BEFORE_CHORUS`         | int[R(0-255), G(0-255), B(0-255), A(0-255)]            | ワイプ前の文字色（合いの手、コーラス用）               |
+| `GENERAL.COLOR_STROKE_FILL_BEFORE_CHORUS`  | int[R(0-255), G(0-255), B(0-255), A(0-255)]            | ワイプ前の縁色（合いの手、コーラス用）                 |
+| `GENERAL.COLOR_FILL_AFTER_CHORUS`          | int[R(0-255), G(0-255), B(0-255), A(0-255)]            | ワイプ後の文字色（合いの手、コーラス用）               |
+| `GENERAL.COLOR_STROKE_FILL_AFTER_CHORUS`   | int[R(0-255), G(0-255), B(0-255), A(0-255)]            | ワイプ後の縁色（合いの手、コーラス用）                 |
+
+
+- 合いの手、パート分けモード用字幕設定
+
+| 変数名                                     | 型                                                    | 説明                                                 |
+|--------------------------------------------|-------------------------------------------------------|------------------------------------------------------|
+| `GENERAL.CHANGE_TO_CHORUS_STR`             | str[]                                                 | 合いの手、コーラスモードに移行する対象文字リスト     |
+| `GENERAL.CHANGE_TO_MAIN_STR`               | str[]                                                 | 合いの手、コーラスに移行する対象文字リスト           |
+| `GENERAL.CHANGE_TO_PART_STR`               | str[]                                                 | パート分けモードに移行する対象文字リスト             |
+| `GENERAL.PART_ICON`                        | str[]                                                 | パート分け表示のアイコン画像のパスリスト             |
+| `GENERAL.PART_ICON_HEIGHT`                 | int                                                   | パート分けアイコン画像の高さ                         |
+| `GENERAL.PART_ICON_OFFSET_X`               | int                                                   | パート分けアイコン画像のX座標オフセット              |
+| `GENERAL.PART_ICON_OFFSET_Y`               | int                                                   | パート分けアイコン画像のY座標オフセット              |
+| `GENERAL.PART_ICON_MARGIN_X`               | int                                                   | パート分けアイコン画像のX方向余白                    |
+| `GENERAL.COLOR_FILL_BEFORE_PART`           | list[int[R(0-255), G(0-255), B(0-255), A(0-255)]]     | パート分けモード用ワイプ前の文字色リスト             |
+| `GENERAL.COLOR_STROKE_FILL_BEFORE_PART`    | list[int[R(0-255), G(0-255), B(0-255), A(0-255)]]     | パート分けモード用ワイプ前の縁色リスト               |
+| `GENERAL.COLOR_FILL_AFTER_PART`            | list[int[R(0-255), G(0-255), B(0-255), A(0-255)]]     | パート分けモード用ワイプ後の文字色リスト             |
+| `GENERAL.COLOR_STROKE_FILL_AFTER_PART`     | list[int[R(0-255), G(0-255), B(0-255), A(0-255)]]     | パート分けモード用ワイプ後の縁色リスト               |
+
+
+- AviUtlでの字幕表示関連の設定
+    - `GENERAL.DISPLAY_BEFORE_TIME`
+    - `GENERAL.DISPLAY_AFTER_TIME`
+    - `GENERAL.DISPLAY_CONNECT_THRESHOLD_TIME`
+    - `GENERAL.PROJECT_WIDTH`
+    - `GENERAL.PROJECT_HEIGHT`
+    - `GENERAL.PROJECT_FRAMERATE`
+    - `GENERAL.PROJECT_MARGIN_X`
+    - `GENERAL.PROJECT_LYRIC_X_OVERLAP_FACTOR`
+    - `GENERAL.PROJECT_Y_0_LYRIC`
+    - `GENERAL.PROJECT_Y_1_LYRIC`
+    - `GENERAL.PROJECT_Y_2_LYRIC`
+    - `GENERAL.PROJECT_Y_3_LYRIC`
+    - `GENERAL.PROJECT_Y_0_RUBY`
+    - `GENERAL.PROJECT_Y_1_RUBY`
+    - `GENERAL.PROJECT_Y_2_RUBY`
+    - `GENERAL.PROJECT_Y_3_RUBY`
+
+- 歌詞字幕の設定
+    - `LYRIC.FONT_PATH`
+    - `LYRIC.FONT_SIZE`
+    - `LYRIC.STROKE_WIDTH`
+    - `LYRIC.MARGIN_SPACE`
+    - `LYRIC.MARGIN_HALF`
+    - `LYRIC.MARGIN_FULL`
+    - `LYRIC.TEXT_WIDTH_MIN`
+
+- ルビ字幕の設定
+    - `RUBY.FONT_PATH`
+    - `RUBY.FONT_SIZE`
+    - `RUBY.STROKE_WIDTH`
+    - `RUBY.MARGIN_SPACE`
+    - `RUBY.MARGIN_HALF`
+    - `RUBY.MARGIN_FULL`
+    - `RUBY.TEXT_WIDTH_MIN`
