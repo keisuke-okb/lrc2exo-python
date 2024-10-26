@@ -1,3 +1,5 @@
 tqdm
+chardet
 numpy<2
 pillow>9
+customtkinter
