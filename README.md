@@ -78,10 +78,13 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
     - カラオケ字幕に使用したいフォントと、付属の`settings.json`をコピーし設定をカスタマイズしてください。
 4. LRC2EXO-Pythonを使用してカラオケ字幕生成
     - 以下のコマンドを実行し、字幕生成を実行してください。
+
 ```shell
 python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルのパス＞" --exo_output_path "＜書き出したいEXOファイルのパス＞" --settings_path "＜手順3で用意した設定ファイルのパス＞"
 ```
+
     - または、`python main_gui.py`を実行し、GUIアプリでファイルパスを指定して生成処理を実行してください。
+
 5. AviUtlで編集
     - 4で生成したEXOファイルを拡張編集タイムラインから読み込み、必要に応じて画像オブジェクトを編集したうえで動画を書き出してください。
 
