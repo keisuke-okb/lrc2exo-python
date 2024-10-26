@@ -63,7 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('--settings_path', type=str, default='settings.json', help='設定ファイルのパス')
     parser.add_argument('--exo_output_path', type=str, required=True, help='出力するEXOファイルのパス')
     parser.add_argument('--lrc_encoding', type=str, default='utf-8', help='歌詞ファイルのエンコード')
-    parser.add_argument('--json_output_path', type=str, default='output.json', help='分析後の歌詞データの保存パス')
+    parser.add_argument('--json_output_path', type=str, default=None, help='分析後の歌詞データの保存パス')
 
     args = parser.parse_args()
     run_generate_exo(**vars(args))
