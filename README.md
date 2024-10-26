@@ -57,7 +57,7 @@ LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕�
 python main.py --input_lrc_path "./sample/2_シャイニングスター（出典：魔王魂）.kra" --exo_output_path "./sample/2_シャイニングスター（出典：魔王魂）.exo"
 ```
 
-- または、`python main_gui.py`を実行するとファイルパスを設定できるGUIアプリを使用してください。
+- または、`python main_gui.py`を実行し、GUIアプリでファイルパスを指定して生成処理を実行してください。
 
 ![GUI](./images/gui.jpg)
 
