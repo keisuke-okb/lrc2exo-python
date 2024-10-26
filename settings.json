@@ -27,14 +27,14 @@
             "./images/icon_part_4.png"
         ],
         "PART_ICON_HEIGHT": 150,
-        "PART_ICON_OFFSET_X": -10,
+        "PART_ICON_OFFSET_X": 10,
         "PART_ICON_OFFSET_Y": -10,
         "PART_ICON_MARGIN_X": 30,
 
         "COLOR_FILL_BEFORE_PART": [
-            [250, 250, 250, 255],
-            [250, 250, 250, 255],
-            [250, 250, 250, 255],
+            [255, 130, 149, 255],
+            [130, 180, 255, 255],
+            [255, 225, 0, 255],
             [250, 250, 250, 255]
         ],
         "COLOR_STROKE_FILL_BEFORE_PART": [
@@ -44,9 +44,9 @@
             [0, 0, 0, 230]
         ],
         "COLOR_FILL_AFTER_PART": [
-            [255, 0, 0, 255],
-            [0, 100, 255, 255],
-            [0, 255, 255, 255],
+            [181, 0, 27, 255],
+            [0, 94, 181, 255],
+            [0, 0, 0, 255],
             [255, 0, 255, 255]
         ],
         "COLOR_STROKE_FILL_AFTER_PART": [
