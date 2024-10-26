@@ -125,47 +125,47 @@ python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルの�
 
 - AviUtlでの字幕表示関連の設定
 
-| 変数名                                         | 型                      | 説明                                              |
-|------------------------------------------------|-------------------------|---------------------------------------------------|
-| `GENERAL.DISPLAY_BEFORE_TIME`                  | int                     | ワイプ前字幕表示開始時間                          |
-| `GENERAL.DISPLAY_AFTER_TIME`                   | int                     | ワイプ後字幕表示残存時間                          |
-| `GENERAL.DISPLAY_CONNECT_THRESHOLD_TIME`       | int                     | 字幕連続切り替え判定閾値時間                      |
-| `GENERAL.PROJECT_WIDTH`                         | int                     | AviUtlプロジェクトの動画幅                        |
-| `GENERAL.PROJECT_HEIGHT`                        | int                     | AviUtlプロジェクトの動画高さ                      |
-| `GENERAL.PROJECT_FRAMERATE`                    | int                     | AviUtlプロジェクトのフレームレート                |
-| `GENERAL.PROJECT_MARGIN_X`                     | int                     | 動画左端からのX座標字幕余白                       |
-| `GENERAL.PROJECT_LYRIC_X_OVERLAP_FACTOR`      | int                     | 多段歌詞の中央寄せ時の重なり具合                 |
-| `GENERAL.PROJECT_Y_0_LYRIC`                    | int                     | 1段目の歌詞Y座標                                 |
-| `GENERAL.PROJECT_Y_1_LYRIC`                    | int                     | 2段目の歌詞Y座標                                 |
-| `GENERAL.PROJECT_Y_2_LYRIC`                    | int                     | 3段目の歌詞Y座標                                 |
-| `GENERAL.PROJECT_Y_3_LYRIC`                    | int                     | 4段目の歌詞Y座標                                 |
-| `GENERAL.PROJECT_Y_0_RUBY`                     | int                     | 1段目のルビY座標                                 |
-| `GENERAL.PROJECT_Y_1_RUBY`                     | int                     | 2段目のルビY座標                                 |
-| `GENERAL.PROJECT_Y_2_RUBY`                     | int                     | 3段目のルビY座標                                 |
-| `GENERAL.PROJECT_Y_3_RUBY`                     | int                     | 4段目のルビY座標                                 |
+| 変数名                                         | 型                                      | 説明                                              |
+|------------------------------------------------|-----------------------------------------|---------------------------------------------------|
+| `GENERAL.DISPLAY_BEFORE_TIME`                  | int(単位：10ミリ秒)                     | ワイプ前字幕表示開始時間                          |
+| `GENERAL.DISPLAY_AFTER_TIME`                   | int(単位：10ミリ秒)                     | ワイプ後字幕表示残存時間                          |
+| `GENERAL.DISPLAY_CONNECT_THRESHOLD_TIME`       | int(単位：10ミリ秒)                     | 字幕連続切り替え判定閾値時間                      |
+| `GENERAL.PROJECT_WIDTH`                        | int(単位：ピクセル)                     | AviUtlプロジェクトの動画幅                        |
+| `GENERAL.PROJECT_HEIGHT`                       | int(単位：ピクセル)                     | AviUtlプロジェクトの動画高さ                      |
+| `GENERAL.PROJECT_FRAMERATE`                    | int                                     | AviUtlプロジェクトのフレームレート                |
+| `GENERAL.PROJECT_MARGIN_X`                     | int(単位：ピクセル)                     | 動画左端からのX座標字幕余白                       |
+| `GENERAL.PROJECT_LYRIC_X_OVERLAP_FACTOR`       | int                                     | 多段歌詞の中央寄せ時の重なり具合                 |
+| `GENERAL.PROJECT_Y_0_LYRIC`                    | int(単位：ピクセル)                     | 1段目の歌詞Y座標                                 |
+| `GENERAL.PROJECT_Y_1_LYRIC`                    | int(単位：ピクセル)                     | 2段目の歌詞Y座標                                 |
+| `GENERAL.PROJECT_Y_2_LYRIC`                    | int(単位：ピクセル)                     | 3段目の歌詞Y座標                                 |
+| `GENERAL.PROJECT_Y_3_LYRIC`                    | int(単位：ピクセル)                     | 4段目の歌詞Y座標                                 |
+| `GENERAL.PROJECT_Y_0_RUBY`                     | int(単位：ピクセル)                     | 1段目のルビY座標                                 |
+| `GENERAL.PROJECT_Y_1_RUBY`                     | int(単位：ピクセル)                     | 2段目のルビY座標                                 |
+| `GENERAL.PROJECT_Y_2_RUBY`                     | int(単位：ピクセル)                     | 3段目のルビY座標                                 |
+| `GENERAL.PROJECT_Y_3_RUBY`                     | int(単位：ピクセル)                     | 4段目のルビY座標                                 |
 
 
 - 歌詞字幕の設定
 
-| 変数名                                         | 型                      | 説明                                              |
-|------------------------------------------------|-------------------------|---------------------------------------------------|
-| `LYRIC.FONT_PATH`                               | str                     | フォントパス                                      |
-| `LYRIC.FONT_SIZE`                               | int                     | フォントサイズ                                    |
-| `LYRIC.STROKE_WIDTH`                           | int                     | 字幕の縁取り幅                                    |
-| `LYRIC.MARGIN_SPACE`                           | int                     | 半角スペースの余白                                |
-| `LYRIC.MARGIN_HALF`                            | int                     | 半角文字の余白                                    |
-| `LYRIC.MARGIN_FULL`                            | int                     | 全角文字の余白                                    |
-| `LYRIC.TEXT_WIDTH_MIN`                         | int                     | 最小文字幅                                        |
+| 変数名                                         | 型                                      | 説明                                              |
+|------------------------------------------------|-----------------------------------------|---------------------------------------------------|
+| `LYRIC.FONT_PATH`                              | str                                     | フォントパス                                      |
+| `LYRIC.FONT_SIZE`                              | int(単位：ピクセル)                     | フォントサイズ                                    |
+| `LYRIC.STROKE_WIDTH`                           | int(単位：ピクセル)                     | 字幕の縁取り幅                                    |
+| `LYRIC.MARGIN_SPACE`                           | int(単位：ピクセル)                     | 半角スペースの余白                                |
+| `LYRIC.MARGIN_HALF`                            | int(単位：ピクセル)                     | 半角文字の余白                                    |
+| `LYRIC.MARGIN_FULL`                            | int(単位：ピクセル)                     | 全角文字の余白                                    |
+| `LYRIC.TEXT_WIDTH_MIN`                         | int(単位：ピクセル)                     | 最小文字幅                                        |
 
 
 - ルビ字幕の設定
 
-| 変数名                                         | 型                      | 説明                                              |
-|------------------------------------------------|-------------------------|---------------------------------------------------|
-| `RUBY.FONT_PATH`                               | str                     | フォントパス                                      |
-| `RUBY.FONT_SIZE`                               | int                     | フォントサイズ                                    |
-| `RUBY.STROKE_WIDTH`                           | int                     | 字幕の縁取り幅                                    |
-| `RUBY.MARGIN_SPACE`                           | int                     | 半角スペースの余白                                |
-| `RUBY.MARGIN_HALF`                            | int                     | 半角文字の余白                                    |
-| `RUBY.MARGIN_FULL`                            | int                     | 全角文字の余白                                    |
-| `RUBY.TEXT_WIDTH_MIN`                         | int                     | 最小文字幅                                        |
+| 変数名                                         | 型                                      | 説明                                              |
+|------------------------------------------------|-----------------------------------------|---------------------------------------------------|
+| `RUBY.FONT_PATH`                               | str                                     | フォントパス                                      |
+| `RUBY.FONT_SIZE`                               | int(単位：ピクセル)                     | フォントサイズ                                    |
+| `RUBY.STROKE_WIDTH`                            | int(単位：ピクセル)                     | 字幕の縁取り幅                                    |
+| `RUBY.MARGIN_SPACE`                            | int(単位：ピクセル)                     | 半角スペースの余白                                |
+| `RUBY.MARGIN_HALF`                             | int(単位：ピクセル)                     | 半角文字の余白                                    |
+| `RUBY.MARGIN_FULL`                             | int(単位：ピクセル)                     | 全角文字の余白                                    |
+| `RUBY.TEXT_WIDTH_MIN`                          | int(単位：ピクセル)                     | 最小文字幅                                        |
