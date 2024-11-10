@@ -141,7 +141,7 @@ python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルの�
 | `GENERAL.PROJECT_HEIGHT`                       | int(単位：ピクセル)                     | AviUtlプロジェクトの動画高さ                      |
 | `GENERAL.PROJECT_FRAMERATE`                    | int                                     | AviUtlプロジェクトのフレームレート                |
 | `GENERAL.PROJECT_MARGIN_X`                     | int(単位：ピクセル)                     | 動画左端からのX座標字幕余白                       |
-| `GENERAL.PROJECT_LYRIC_X_OVERLAP_FACTOR`       | int                                     | 多段歌詞の中央寄せ時の重なり具合                 |
+| `GENERAL.PROJECT_LYRIC_X_OVERLAP_FACTOR`       | float                                   | 多段歌詞の中央寄せ時の重なり具合                 |
 | `GENERAL.PROJECT_Y_0_LYRIC`                    | int(単位：ピクセル)                     | 1段目の歌詞Y座標                                 |
 | `GENERAL.PROJECT_Y_1_LYRIC`                    | int(単位：ピクセル)                     | 2段目の歌詞Y座標                                 |
 | `GENERAL.PROJECT_Y_2_LYRIC`                    | int(単位：ピクセル)                     | 3段目の歌詞Y座標                                 |
