@@ -84,7 +84,8 @@
         "MARGIN_SPACE": 40,
         "MARGIN_HALF": 15,
         "MARGIN_FULL": 30,
-        "TEXT_WIDTH_MIN": 40
+        "TEXT_WIDTH_MIN": 40,
+        "Y_DRAW_OFFSET": -10
     },
     
     "RUBY": {
@@ -94,6 +95,7 @@
         "MARGIN_SPACE": 5,
         "MARGIN_HALF": 10,
         "MARGIN_FULL": 24,
-        "TEXT_WIDTH_MIN": 5
+        "TEXT_WIDTH_MIN": 5,
+        "Y_DRAW_OFFSET": -10
     }
 }

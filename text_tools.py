@@ -202,8 +202,8 @@ def draw_lyric_image_with_ruby(data, settings, output_path_1="images/output_1.pn
             _bbox = _data["bbox"]
             _width = _data["width"]
             _margin = _data["margin"]
-            draw_1.text((_x_lyric - _bbox[0], settings.GENERAL.Y_LYRIC), t, font=font_lyric, fill=COLOR_FILL_BEFORE_CURRENT, stroke_width=settings.LYRIC.STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_BEFORE_CURRENT)
-            draw_2.text((_x_lyric - _bbox[0], settings.GENERAL.Y_LYRIC), t, font=font_lyric, fill=COLOR_FILL_AFTER_CURRENT, stroke_width=settings.LYRIC.STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_AFTER_CURRENT)
+            draw_1.text((_x_lyric - _bbox[0], settings.GENERAL.Y_LYRIC + settings.LYRIC.Y_DRAW_OFFSET), t, font=font_lyric, fill=COLOR_FILL_BEFORE_CURRENT, stroke_width=settings.LYRIC.STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_BEFORE_CURRENT)
+            draw_2.text((_x_lyric - _bbox[0], settings.GENERAL.Y_LYRIC + settings.LYRIC.Y_DRAW_OFFSET), t, font=font_lyric, fill=COLOR_FILL_AFTER_CURRENT, stroke_width=settings.LYRIC.STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_AFTER_CURRENT)
             _x_lyric += _width + _margin
         
         x_end_lyric.append(int(_x_lyric - _margin + settings.LYRIC.STROKE_WIDTH))
@@ -216,8 +216,8 @@ def draw_lyric_image_with_ruby(data, settings, output_path_1="images/output_1.pn
             _bbox = _data["bbox"]
             _width = _data["width"]
             _margin = _data["margin"]
-            draw_1.text((_x_ruby - _bbox[0], settings.GENERAL.Y_RUBY), t, font=font_ruby, fill=COLOR_FILL_BEFORE_CURRENT, stroke_width=settings.RUBY.STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_BEFORE_CURRENT)
-            draw_2.text((_x_ruby - _bbox[0], settings.GENERAL.Y_RUBY), t, font=font_ruby, fill=COLOR_FILL_AFTER_CURRENT, stroke_width=settings.RUBY.STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_AFTER_CURRENT)
+            draw_1.text((_x_ruby - _bbox[0], settings.GENERAL.Y_RUBY + settings.RUBY.Y_DRAW_OFFSET), t, font=font_ruby, fill=COLOR_FILL_BEFORE_CURRENT, stroke_width=settings.RUBY.STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_BEFORE_CURRENT)
+            draw_2.text((_x_ruby - _bbox[0], settings.GENERAL.Y_RUBY + settings.RUBY.Y_DRAW_OFFSET), t, font=font_ruby, fill=COLOR_FILL_AFTER_CURRENT, stroke_width=settings.RUBY.STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_AFTER_CURRENT)
             _x_ruby += _width + _margin
 
         x_end_ruby.append(int(_x_ruby - _margin + settings.RUBY.STROKE_WIDTH))
