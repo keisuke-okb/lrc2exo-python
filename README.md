@@ -1,5 +1,7 @@
 **The English version of the README is available [here](./README_en.md).**
 
+*IMPORTANT*: This software is designed primarily for generating subtitles for Japanese lyrics and English lyrics with Japanese ruby annotations. Subtitles for other languages may not work as intended and could result in unexpected bugs or issues.
+
 # LRC2EXO-Python
 
 ![イメージ画像](./images/LRC2EXO-Python.jpg)
