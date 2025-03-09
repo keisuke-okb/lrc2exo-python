@@ -1,4 +1,4 @@
-[English](./README_en.md)
+**The English version of the README is available [here](./README_en.md).**
 
 # LRC2EXO-Python
 
