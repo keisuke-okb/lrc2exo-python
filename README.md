@@ -1,3 +1,5 @@
+[English](./README_en.md)
+
 # LRC2EXO-Python
 
 ![イメージ画像](./images/LRC2EXO-Python.jpg)
