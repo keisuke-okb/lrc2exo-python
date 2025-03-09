@@ -1,5 +1,7 @@
 # LRC2EXO-Python
 
+*IMPORTANT*: This software is designed primarily for generating subtitles for Japanese lyrics and English lyrics with Japanese ruby annotations. Subtitles for other languages may not work as intended and could result in unexpected bugs or issues.
+
 ![Image](./images/LRC2EXO-Python.jpg)
 
 Software that creates karaoke subtitles for AviUtl from LRC/KRA lyric files with ruby annotations.
