@@ -14,6 +14,19 @@ def calc_margin_x(w, w1, w2, settings):
 def convert_x(x, settings):
     return int(x - settings.GENERAL.PROJECT_WIDTH // 2)
 
+def divide_segments(x_start, x_end, division_points):
+    total_ratio = sum(division_points)
+    segment_length = (x_end - x_start) / total_ratio
+    
+    x_coords = [x_start]
+    current_x = x_start
+    
+    for ratio in division_points:
+        current_x += ratio * segment_length
+        x_coords.append(current_x)
+    
+    return x_coords
+
 def generate_exo(data, settings):
     # Output EXO
     output_exo = ""
@@ -108,26 +121,54 @@ def generate_exo(data, settings):
 
         # Front lyric chain
         for j in range(len(dc["times"]) - 1):
-            front_exo = EXOTemplate.FRONT_CHAIN
-            start = calc_frame_from_time(dc["times"][j], settings) + 1
-            end = calc_frame_from_time(dc["times"][j + 1], settings)
-            layer = 12 + display_row
-            left = dc["x_start_lyric"][j]
-            right = dc["x_end_lyric"][j]
+            delta_time_s = (dc["times"][j + 1] - dc["times"][j]) / 100
+            if delta_time_s >= settings.LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S:
+                division_times = divide_segments(dc["times"][j], dc["times"][j + 1], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES)
+                division_xs = divide_segments(dc["x_start_lyric"][j], dc["x_end_lyric"][j], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS)
 
-            front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
-            front_exo = front_exo.replace("{start}", f"{start}")
-            front_exo = front_exo.replace("{end}", f"{end}")
-            front_exo = front_exo.replace("{layer}", f"{layer}")
-            front_exo = front_exo.replace("{x}", f"{x}")
-            front_exo = front_exo.replace("{y}", f"{y}")
-            front_exo = front_exo.replace("{left}", f"{left}")
-            front_exo = front_exo.replace("{right}", f"{right}")
-            front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
-            front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+                for k in range(len(division_times) - 1):
+                    front_exo = EXOTemplate.FRONT_CHAIN
+                    start = calc_frame_from_time(division_times[k], settings) + 1
+                    end = calc_frame_from_time(division_times[k + 1], settings)
+                    layer = 12 + display_row
+                    left = division_xs[k] // 1
+                    right = division_xs[k + 1] // 1
 
-            output_exo += front_exo
-            obj_id += 1
+                    front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
+                    front_exo = front_exo.replace("{start}", f"{start}")
+                    front_exo = front_exo.replace("{end}", f"{end}")
+                    front_exo = front_exo.replace("{layer}", f"{layer}")
+                    front_exo = front_exo.replace("{x}", f"{x}")
+                    front_exo = front_exo.replace("{y}", f"{y}")
+                    front_exo = front_exo.replace("{left}", f"{left}")
+                    front_exo = front_exo.replace("{right}", f"{right}")
+                    front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
+                    front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+
+                    output_exo += front_exo
+                    obj_id += 1
+
+            else:
+                front_exo = EXOTemplate.FRONT_CHAIN
+                start = calc_frame_from_time(dc["times"][j], settings) + 1
+                end = calc_frame_from_time(dc["times"][j + 1], settings)
+                layer = 12 + display_row
+                left = dc["x_start_lyric"][j]
+                right = dc["x_end_lyric"][j]
+
+                front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
+                front_exo = front_exo.replace("{start}", f"{start}")
+                front_exo = front_exo.replace("{end}", f"{end}")
+                front_exo = front_exo.replace("{layer}", f"{layer}")
+                front_exo = front_exo.replace("{x}", f"{x}")
+                front_exo = front_exo.replace("{y}", f"{y}")
+                front_exo = front_exo.replace("{left}", f"{left}")
+                front_exo = front_exo.replace("{right}", f"{right}")
+                front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
+                front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+
+                output_exo += front_exo
+                obj_id += 1
 
         # back ruby
         back_exo = EXOTemplate.BACK
@@ -185,25 +226,53 @@ def generate_exo(data, settings):
 
         # Front ruby chain
         for j in range(len(dc["times"]) - 1):
-            front_exo = EXOTemplate.FRONT_CHAIN
-            start = calc_frame_from_time(dc["times"][j], settings) + 1
-            end = calc_frame_from_time(dc["times"][j + 1], settings)
-            layer = 16 + display_row
-            left = dc["x_start_ruby"][j]
-            right = dc["x_end_ruby"][j]
+            delta_time_s = (dc["times"][j + 1] - dc["times"][j]) / 100
+            if delta_time_s >= settings.RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S:
+                division_times = divide_segments(dc["times"][j], dc["times"][j + 1], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES)
+                division_xs = divide_segments(dc["x_start_ruby"][j], dc["x_end_ruby"][j], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS)
 
-            front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
-            front_exo = front_exo.replace("{start}", f"{start}")
-            front_exo = front_exo.replace("{end}", f"{end}")
-            front_exo = front_exo.replace("{layer}", f"{layer}")
-            front_exo = front_exo.replace("{x}", f"{x}")
-            front_exo = front_exo.replace("{y}", f"{y}")
-            front_exo = front_exo.replace("{left}", f"{left}")
-            front_exo = front_exo.replace("{right}", f"{right}")
-            front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
-            front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+                for k in range(len(division_times) - 1):
+                    front_exo = EXOTemplate.FRONT_CHAIN
+                    start = calc_frame_from_time(division_times[k], settings) + 1
+                    end = calc_frame_from_time(division_times[k + 1], settings)
+                    layer = 16 + display_row
+                    left = division_xs[k] // 1
+                    right = division_xs[k + 1] // 1
 
-            output_exo += front_exo
-            obj_id += 1
+                    front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
+                    front_exo = front_exo.replace("{start}", f"{start}")
+                    front_exo = front_exo.replace("{end}", f"{end}")
+                    front_exo = front_exo.replace("{layer}", f"{layer}")
+                    front_exo = front_exo.replace("{x}", f"{x}")
+                    front_exo = front_exo.replace("{y}", f"{y}")
+                    front_exo = front_exo.replace("{left}", f"{left}")
+                    front_exo = front_exo.replace("{right}", f"{right}")
+                    front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
+                    front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+
+                    output_exo += front_exo
+                    obj_id += 1
+            
+            else:
+                front_exo = EXOTemplate.FRONT_CHAIN
+                start = calc_frame_from_time(dc["times"][j], settings) + 1
+                end = calc_frame_from_time(dc["times"][j + 1], settings)
+                layer = 16 + display_row
+                left = dc["x_start_ruby"][j]
+                right = dc["x_end_ruby"][j]
+
+                front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
+                front_exo = front_exo.replace("{start}", f"{start}")
+                front_exo = front_exo.replace("{end}", f"{end}")
+                front_exo = front_exo.replace("{layer}", f"{layer}")
+                front_exo = front_exo.replace("{x}", f"{x}")
+                front_exo = front_exo.replace("{y}", f"{y}")
+                front_exo = front_exo.replace("{left}", f"{left}")
+                front_exo = front_exo.replace("{right}", f"{right}")
+                front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
+                front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+
+                output_exo += front_exo
+                obj_id += 1
 
     return output_exo

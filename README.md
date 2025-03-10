@@ -35,6 +35,7 @@ LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕�
 - 括弧による合いの手歌詞自動認識
 - 歌詞・ルビの文字間隔、縁取り幅などの多様な字幕画像の出力設定
 - 歌いだし表示時間、字幕残存時間などのEXOのオブジェクト設定
+- ロングトーン等でのゆっくりとしたワイプの際、ワイプ速度を調整する機能（`ADJUST_WIPE_SPEED_XXX`パラメータ）
 
 # サンプルファイルを使ったチュートリアル
 
@@ -168,6 +169,9 @@ python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルの�
 | `LYRIC.MARGIN_FULL`                            | int(単位：ピクセル)                     | 全角文字の余白                                    |
 | `LYRIC.TEXT_WIDTH_MIN`                         | int(単位：ピクセル)                     | 最小文字幅                                        |
 | `LYRIC.Y_DRAW_OFFSET`                          | int(単位：ピクセル)                     | 文字描画時のY座標オフセット（フォントによるずれを補正）       |
+| `LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float(単位：秒)                       | タイムタグ間のワイプ速度を調整する秒数の閾値                |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                               | ワイプＸ座標の始点・終点に対する相対分割リスト             |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                               | ワイプ時間の始点・終点に対する相対分割リスト                |
 
 
 - ルビ字幕の設定
@@ -182,3 +186,14 @@ python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルの�
 | `RUBY.MARGIN_FULL`                             | int(単位：ピクセル)                     | 全角文字の余白                                    |
 | `RUBY.TEXT_WIDTH_MIN`                          | int(単位：ピクセル)                     | 最小文字幅                                        |
 | `RUBY.Y_DRAW_OFFSET`                           | int(単位：ピクセル)                     | 文字描画時のY座標オフセット（フォントによるずれを補正）       |
+| `RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float(単位：秒)                       | タイムタグ間のワイプ速度を調整する秒数の閾値                |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                               | ワイプＸ座標の始点・終点に対する相対分割リスト             |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                               | ワイプ時間の始点・終点に対する相対分割リスト                |
+
+
+### ADJUST_WIPE_SPEED_XXXパラメータの挙動について
+
+- これらのパラメータは、ロングトーン等でタイムタグ間の時間が大きく、”ゆっくりワイプ”する際のワイプ速度の挙動を調整するためのものです。
+- 次のタイムタグまでの時間（秒）が`ADJUST_WIPE_SPEED_THRESHOLD_S`を超えると発動します。
+
+![ワイプ速度の調整](./images/ADJUST_WIPE_SPEED.jpg)

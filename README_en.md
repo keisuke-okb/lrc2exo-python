@@ -173,6 +173,10 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
 | `LYRIC.MARGIN_FULL`        | int (unit: pixels)          | Margin for full-width characters                                 |
 | `LYRIC.TEXT_WIDTH_MIN`     | int (unit: pixels)          | Minimum text width                                               |
 | `LYRIC.Y_DRAW_OFFSET`      | int (unit: pixels)          | Y-axis offset when drawing text (compensates for font differences) |
+| `LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float (unit: seconds)      | Threshold for adjusting wipe speed between time tags |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                      | Relative division list for the start and end of the wipe X coordinate |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                      | Relative division list for the start and end of the wipe duration |
+
 
 ---
 
@@ -188,3 +192,14 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
 | `RUBY.MARGIN_FULL`         | int (unit: pixels)          | Margin for full-width characters                                 |
 | `RUBY.TEXT_WIDTH_MIN`      | int (unit: pixels)          | Minimum text width                                               |
 | `RUBY.Y_DRAW_OFFSET`       | int (unit: pixels)          | Y-axis offset when drawing text (compensates for font differences) |
+| `RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float (unit: seconds)        | Threshold for adjusting wipe speed between time tags |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                        | Relative division list for the start and end of the wipe X coordinate |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                        | Relative division list for the start and end of the wipe duration |
+
+
+### Behavior of ADJUST_WIPE_SPEED_XXX Parameters
+
+- These parameters are used to adjust the behavior of wipe speed when there is a long duration between time tags, such as during long tones, causing a "slow wipe."
+- The adjustment is triggered when the time until the next time tag (in seconds) exceeds `ADJUST_WIPE_SPEED_THRESHOLD_S`.
+
+![Wipe Speed Adjustment](./images/ADJUST_WIPE_SPEED.jpg)
