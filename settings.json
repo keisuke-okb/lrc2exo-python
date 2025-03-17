@@ -103,5 +103,27 @@
         "ADJUST_WIPE_SPEED_THRESHOLD_S": 0.8,
         "ADJUST_WIPE_SPEED_DIVISION_POINTS": [2.5, 1.0, 1.0, 1.0],
         "ADJUST_WIPE_SPEED_DIVISION_TIMES": [1.0, 1.5, 2.0, 1.5]
+    },
+
+    "LYRIC_CHORUS":{
+        "FONT_PATH": "/path/to/font.ttf",
+        "FONT_SIZE": 86,
+        "STROKE_WIDTH": 10,
+        "MARGIN_SPACE": 26,
+        "MARGIN_HALF": 14,
+        "MARGIN_FULL": 28,
+        "TEXT_WIDTH_MIN": 30,
+        "Y_DRAW_OFFSET": 12
+    },
+
+    "RUBY_CHORUS":{
+        "FONT_PATH": "/path/to/font.ttf",
+        "FONT_SIZE": 33,
+        "STROKE_WIDTH": 10,
+        "MARGIN_SPACE": 4,
+        "MARGIN_HALF": 8,
+        "MARGIN_FULL": 20,
+        "TEXT_WIDTH_MIN": 5,
+        "Y_DRAW_OFFSET": 10
     }
 }
