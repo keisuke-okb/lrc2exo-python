@@ -6,18 +6,18 @@
         "Y_LYRIC": 100,
         "Y_RUBY": 30,
 
-        "COLOR_FILL_BEFORE": [250, 250, 250, 255],
-        "COLOR_STROKE_FILL_BEFORE": [0, 0, 0, 230],
+        "COLOR_FILL_BEFORE": [240, 240, 240, 255],
+        "COLOR_STROKE_FILL_BEFORE": [15, 15, 15, 255],
         "COLOR_FILL_AFTER": [0, 0, 255, 255],
-        "COLOR_STROKE_FILL_AFTER": [250, 250, 250, 230],
+        "COLOR_STROKE_FILL_AFTER": [240, 240, 240, 255],
 
-        "COLOR_FILL_BEFORE_CHORUS": [10, 10, 10, 255],
-        "COLOR_STROKE_FILL_BEFORE_CHORUS": [250, 250, 250, 255],
-        "COLOR_FILL_AFTER_CHORUS": [10, 10, 10, 255],
-        "COLOR_STROKE_FILL_AFTER_CHORUS": [250, 250, 250, 255],
+        "COLOR_FILL_BEFORE_CHORUS": [15, 15, 15, 255],
+        "COLOR_STROKE_FILL_BEFORE_CHORUS": [240, 240, 240, 255],
+        "COLOR_FILL_AFTER_CHORUS": [15, 15, 15, 255],
+        "COLOR_STROKE_FILL_AFTER_CHORUS": [240, 240, 240, 255],
 
-        "CHANGE_TO_CHORUS_STR": ["(", "（"],
-        "CHANGE_TO_MAIN_STR": [")", "）"],
+        "CHANGE_TO_CHORUS_STR": ["(", "（", "＜"],
+        "CHANGE_TO_MAIN_STR": [")", "）", "＞"],
 
         "CHANGE_TO_PART_STR": ["①", "②", "①②", "④"],
         "PART_ICON": [
@@ -38,10 +38,10 @@
             [250, 250, 250, 255]
         ],
         "COLOR_STROKE_FILL_BEFORE_PART": [
-            [0, 0, 0, 230],
-            [0, 0, 0, 230],
-            [0, 0, 0, 230],
-            [0, 0, 0, 230]
+            [15, 15, 15, 255],
+            [15, 15, 15, 255],
+            [15, 15, 15, 255],
+            [15, 15, 15, 255]
         ],
         "COLOR_FILL_AFTER_PART": [
             [181, 0, 27, 255],
@@ -50,10 +50,10 @@
             [255, 0, 255, 255]
         ],
         "COLOR_STROKE_FILL_AFTER_PART": [
-            [250, 250, 250, 230],
-            [250, 250, 250, 230],
-            [250, 250, 250, 230],
-            [250, 250, 250, 230]
+            [240, 240, 240, 255],
+            [240, 240, 240, 255],
+            [240, 240, 240, 255],
+            [240, 240, 240, 255]
         ],
 
         "DISPLAY_BEFORE_TIME": 300,
@@ -71,21 +71,21 @@
         "PROJECT_Y_2_LYRIC": 200,
         "PROJECT_Y_3_LYRIC": 420,
 
-        "PROJECT_Y_0_RUBY": -240,
-        "PROJECT_Y_1_RUBY": -20,
-        "PROJECT_Y_2_RUBY": 200,
-        "PROJECT_Y_3_RUBY": 420
+        "PROJECT_Y_0_RUBY": -232,
+        "PROJECT_Y_1_RUBY": -12,
+        "PROJECT_Y_2_RUBY": 208,
+        "PROJECT_Y_3_RUBY": 428
     },
 
     "LYRIC": {
         "FONT_PATH": "/path/to/font.ttf",
-        "FONT_SIZE": 115,
-        "STROKE_WIDTH": 12,
-        "MARGIN_SPACE": 40,
-        "MARGIN_HALF": 15,
-        "MARGIN_FULL": 30,
-        "TEXT_WIDTH_MIN": 40,
-        "Y_DRAW_OFFSET": -10,
+        "FONT_SIZE": 110,
+        "STROKE_WIDTH": 10,
+        "MARGIN_SPACE": 30,
+        "MARGIN_HALF": 14,
+        "MARGIN_FULL": 28,
+        "TEXT_WIDTH_MIN": 38,
+        "Y_DRAW_OFFSET": 0,
         "ADJUST_WIPE_SPEED_THRESHOLD_S": 0.8,
         "ADJUST_WIPE_SPEED_DIVISION_POINTS": [2.5, 1.0, 1.0, 1.0],
         "ADJUST_WIPE_SPEED_DIVISION_TIMES": [1.0, 1.5, 2.0, 1.5]
@@ -93,13 +93,13 @@
     
     "RUBY": {
         "FONT_PATH": "/path/to/font.ttf",
-        "FONT_SIZE": 45,
-        "STROKE_WIDTH": 12,
-        "MARGIN_SPACE": 5,
-        "MARGIN_HALF": 10,
-        "MARGIN_FULL": 24,
+        "FONT_SIZE": 44,
+        "STROKE_WIDTH": 10,
+        "MARGIN_SPACE": 4,
+        "MARGIN_HALF": 8,
+        "MARGIN_FULL": 20,
         "TEXT_WIDTH_MIN": 5,
-        "Y_DRAW_OFFSET": -10,
+        "Y_DRAW_OFFSET": 0,
         "ADJUST_WIPE_SPEED_THRESHOLD_S": 0.8,
         "ADJUST_WIPE_SPEED_DIVISION_POINTS": [2.5, 1.0, 1.0, 1.0],
         "ADJUST_WIPE_SPEED_DIVISION_TIMES": [1.0, 1.5, 2.0, 1.5]
