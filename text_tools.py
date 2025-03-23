@@ -175,11 +175,11 @@ def draw_lyric_image_with_ruby(data, settings, output_path_1="images/output_1.pn
         _width_ruby = draw_text_with_bbox(ruby, settings=settings, mode="ruby", is_chorus=IS_CHORUS)
 
         if lyric == " ":
-            x_start_lyric.append(int(x_base))
-            x_start_ruby.append(int(x_base))
-            x_base += getattr(settings, lyric_cat).MARGIN_SPACE - getattr(settings, lyric_cat).STROKE_WIDTH
-            x_end_lyric.append(int(x_base))
-            x_end_ruby.append(int(x_base))
+            x_start_lyric.append(x_end_lyric[-1])
+            x_start_ruby.append(x_end_ruby[-1])
+            x_base += getattr(settings, lyric_cat).MARGIN_SPACE
+            x_end_lyric.append(int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH))
+            x_end_ruby.append(int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH))
             continue
 
         elif lyric == "":
