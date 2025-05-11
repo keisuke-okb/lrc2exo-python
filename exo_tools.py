@@ -100,7 +100,7 @@ def generate_exo(data, settings):
         # Front lyric
         front_exo = EXOTemplate.FRONT
         start = calc_frame_from_time(dc["display_start_time"], settings) + 1
-        end = calc_frame_from_time(dc["times"][0], settings)
+        end = calc_frame_from_time(dc["times"][0][0], settings)
         layer = 12 + display_row
         file = dc["image_1"]
         clip_up = settings.GENERAL.Y_LYRIC - settings.LYRIC.STROKE_WIDTH
@@ -121,10 +121,10 @@ def generate_exo(data, settings):
 
         # Front lyric chain
         for j in range(len(dc["times"]) - 1):
-            delta_time_s = (dc["times"][j + 1] - dc["times"][j]) / 100
+            delta_time_s = (dc["times"][j + 1][0] - dc["times"][j][0]) / 100
             if delta_time_s >= settings.LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S:
-                division_times = divide_segments(dc["times"][j], dc["times"][j + 1], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES)
-                division_xs = divide_segments(dc["x_start_lyric"][j], dc["x_end_lyric"][j], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS)
+                division_times = divide_segments(dc["times"][j][0], dc["times"][j + 1][0], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES)
+                division_xs = divide_segments(dc["x_start_lyric"][j][0], dc["x_end_lyric"][j][0], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS)
 
                 for k in range(len(division_times) - 1):
                     front_exo = EXOTemplate.FRONT_CHAIN
@@ -150,11 +150,11 @@ def generate_exo(data, settings):
 
             else:
                 front_exo = EXOTemplate.FRONT_CHAIN
-                start = calc_frame_from_time(dc["times"][j], settings) + 1
-                end = calc_frame_from_time(dc["times"][j + 1], settings)
+                start = calc_frame_from_time(dc["times"][j][0], settings) + 1
+                end = calc_frame_from_time(dc["times"][j + 1][0], settings)
                 layer = 12 + display_row
-                left = dc["x_start_lyric"][j]
-                right = dc["x_end_lyric"][j]
+                left = dc["x_start_lyric"][j][0]
+                right = dc["x_end_lyric"][j][0]
 
                 front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
                 front_exo = front_exo.replace("{start}", f"{start}")
@@ -205,7 +205,7 @@ def generate_exo(data, settings):
         # Front ruby
         front_exo = EXOTemplate.FRONT
         start = calc_frame_from_time(dc["display_start_time"], settings) + 1
-        end = calc_frame_from_time(dc["times"][0], settings)
+        end = calc_frame_from_time(dc["times"][0][0], settings)
         layer = 16 + display_row
         file = dc["image_1"]
         clip_up = 0
@@ -224,12 +224,18 @@ def generate_exo(data, settings):
         output_exo += front_exo
         obj_id += 1
 
+        _dc_ruby = {
+            "times": [x for sub in dc["times"] for x in sub],
+            "x_start_ruby": [x for sub in dc["x_start_ruby"] for x in sub],
+            "x_end_ruby": [x for sub in dc["x_end_ruby"] for x in sub],
+        }
+
         # Front ruby chain
-        for j in range(len(dc["times"]) - 1):
-            delta_time_s = (dc["times"][j + 1] - dc["times"][j]) / 100
+        for j in range(len(_dc_ruby["times"]) - 1):
+            delta_time_s = (_dc_ruby["times"][j + 1] - _dc_ruby["times"][j]) / 100
             if delta_time_s >= settings.RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S:
-                division_times = divide_segments(dc["times"][j], dc["times"][j + 1], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES)
-                division_xs = divide_segments(dc["x_start_ruby"][j], dc["x_end_ruby"][j], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS)
+                division_times = divide_segments(_dc_ruby["times"][j], _dc_ruby["times"][j + 1], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES)
+                division_xs = divide_segments(_dc_ruby["x_start_ruby"][j], _dc_ruby["x_end_ruby"][j], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS)
 
                 for k in range(len(division_times) - 1):
                     front_exo = EXOTemplate.FRONT_CHAIN
@@ -255,11 +261,11 @@ def generate_exo(data, settings):
             
             else:
                 front_exo = EXOTemplate.FRONT_CHAIN
-                start = calc_frame_from_time(dc["times"][j], settings) + 1
-                end = calc_frame_from_time(dc["times"][j + 1], settings)
+                start = calc_frame_from_time(_dc_ruby["times"][j], settings) + 1
+                end = calc_frame_from_time(_dc_ruby["times"][j + 1], settings)
                 layer = 16 + display_row
-                left = dc["x_start_ruby"][j]
-                right = dc["x_end_ruby"][j]
+                left = _dc_ruby["x_start_ruby"][j]
+                right = _dc_ruby["x_end_ruby"][j]
 
                 front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
                 front_exo = front_exo.replace("{start}", f"{start}")
