@@ -4,6 +4,8 @@
 
 # LRC2EXO-Python
 
+**最新リリースのダウンロードはこちらから**：https://github.com/keisuke-okb/lrc2exo-python/releases
+
 ![イメージ画像](./images/LRC2EXO-Python.jpg)
 
 LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕を作成するソフトウェア
@@ -41,6 +43,28 @@ LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕�
 - 歌いだし表示時間、字幕残存時間などのEXOのオブジェクト設定
 - ロングトーン等でのゆっくりとしたワイプの際、ワイプ速度を調整する機能（`ADJUST_WIPE_SPEED_XXX`パラメータ）
 
+## 環境構築手順
+
+- 本ソフトウェアはPython環境を用いて処理を行います。以下の手順に沿って実行環境を作成してください。
+  - 推奨Pythonバージョン：3.10, 3.11
+
+### 1. 仮想環境作成
+
+- PowerShellで以下のコマンドを実行してください。
+
+```powershell
+PS> git clone https://github.com/keisuke-okb/lrc2exo-python
+PS> cd lrc2exo-python
+PS> python -m venv venv
+PS> .\venv\Scripts\Activate.ps1
+```
+
+### 2. ライブラリのインストール
+
+```powershell
+(venv) PS> pip install -r requirements.txt
+```
+
 # サンプルファイルを使ったチュートリアル（txt2ass向けKRA）
 
 1. サンプルのプレーンな歌詞ファイル`sample/1_シャイニングスター（出典：魔王魂）.txt`を、タイムタグ歌詞作成ソフト「RhythmicaLyrics」を使って書き出した`sample/1_シャイニングスター（出典：魔王魂）.kra`の中身を確認します。
@@ -62,8 +86,8 @@ LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕�
 3. `settings.json`を開き、"LYRIC">"FONT_PATH"、"RUBY">"FONT_PATH"にフォントファイルのパスを設定し保存します。
 4. ターミナルでこのリポジトリのディレクトリに移動し、以下のコマンドを実行すると字幕の生成を開始します。
 
-```shell
-python main.py --input_lrc_path "./sample/2_シャイニングスター（出典：魔王魂）.kra" --exo_output_path "./sample/2_シャイニングスター（出典：魔王魂）.exo"
+```powershell
+(venv) PS> python main.py --input_lrc_path "./sample/2_シャイニングスター（出典：魔王魂）.kra" --exo_output_path "./sample/2_シャイニングスター（出典：魔王魂）.exo"
 ```
 
 - または、`python main_gui.py`を実行し、GUIアプリでファイルパスを指定して生成処理を実行してください。
@@ -82,7 +106,7 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
     - `sample/1_シャイニングスター（出典：魔王魂）.txt`を参考に、最大４行を１ブロック、空白行を区切りとして歌詞ファイルを用意してください。
 2. タイムタグ作成ソフトを使ってLRC・KRAファイルを書き出す
     - 「RhythmicaLyrics」などのソフトウェアを使いタイムタグを付けた歌詞ファイルをLRCまたはKRAファイルとして保存してください。
-    - KRCファイルを書き出す場合、RhythmicaLyricsの「出力」から「txt2ass向け」のものを選択してください。
+    - KRAファイルを書き出す場合、RhythmicaLyricsの「出力」から「txt2ass向け」のものを選択してください。
     - LRCファイルを書き出す場合、RhythmicaLyricsの「出力」から「ルビ拡張規格」のものを選択してください。
 3. フォントファイル、settings.jsonの準備
     - カラオケ字幕に使用したいフォントと、付属の`settings.json`をコピーし設定をカスタマイズしてください。
@@ -90,8 +114,8 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
     - 以下のコマンドを実行し、字幕生成を実行してください。
     - または、`python main_gui.py`を実行し、GUIアプリでファイルパスを指定して生成処理を実行してください。
 
-```shell
-python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルのパス＞" --exo_output_path "＜書き出したいEXOファイルのパス＞" --settings_path "＜手順3で用意した設定ファイルのパス＞"
+```powershell
+(venv) PS> python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルのパス＞" --exo_output_path "＜書き出したいEXOファイルのパス＞" --settings_path "＜手順3で用意した設定ファイルのパス＞"
 ```
 
 5. AviUtlで編集
