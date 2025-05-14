@@ -121,8 +121,11 @@ def generate_exo(data, settings):
 
         # Front lyric chain
         for j in range(len(dc["times"]) - 1):
+
             delta_time_s = (dc["times"][j + 1][0] - dc["times"][j][0]) / 100
-            if delta_time_s >= settings.LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S:
+            
+            if len(dc["times"][j]) == 1 and delta_time_s >= settings.LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S:
+                # ルビの文字単位でのワイプ定義がない and ワイプ速度有効の場合：設定に沿ってワイプ速度を変更
                 division_times = divide_segments(dc["times"][j][0], dc["times"][j + 1][0], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES)
                 division_xs = divide_segments(dc["x_start_lyric"][j][0], dc["x_end_lyric"][j][0], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS)
 
@@ -148,7 +151,77 @@ def generate_exo(data, settings):
                     output_exo += front_exo
                     obj_id += 1
 
+            elif len(dc["times"][j]) > 1 and settings.LYRIC.SYNC_WIPE_WITH_RUBY:
+                # ルビの文字単位でのワイプ定義がある and ルビ・歌詞のワイプ同期ONの場合：ルビのワイプに合わせて歌詞もワイプ
+
+                _time_deltas = [
+                    (dc["times"][j][k+1] if k+1 < len(dc["times"][j]) else dc["times"][j + 1][0]) - dc["times"][j][k]
+                    for k in range(len(dc["times"][j]))
+                ]
+                _x_deltas = [
+                    (dc["x_start_ruby"][j][k+1] if k+1 < len(dc["x_start_ruby"][j]) else dc["x_end_ruby"][j][-1]) - dc["x_start_ruby"][j][k]
+                    for k in range(len(dc["x_start_ruby"][j]))
+                ]
+
+                division_times = divide_segments(dc["times"][j][0], dc["times"][j + 1][0], _time_deltas)
+                division_xs = divide_segments(dc["x_start_lyric"][j][0], dc["x_end_lyric"][j][0], _x_deltas)
+
+                for k in range(len(division_times) - 1):
+
+                    _delta_time_s = (division_times[k + 1] - division_times[k]) / 100
+
+                    # ルビの文字でワイプ速度有効の場合は、歌詞のワイプもルビに合わせる
+                    if _delta_time_s >= settings.RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S:
+                        _division_times = divide_segments(division_times[k], division_times[k + 1], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES)
+                        _division_xs = divide_segments(division_xs[k], division_xs[k + 1], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS)
+                        
+                        for l in range(len(_division_times) - 1):
+                            front_exo = EXOTemplate.FRONT_CHAIN
+                            start = calc_frame_from_time(_division_times[l], settings) + 1
+                            end = calc_frame_from_time(_division_times[l + 1], settings)
+                            layer = 12 + display_row
+                            left = _division_xs[l] // 1
+                            right = _division_xs[l + 1] // 1
+
+                            front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
+                            front_exo = front_exo.replace("{start}", f"{start}")
+                            front_exo = front_exo.replace("{end}", f"{end}")
+                            front_exo = front_exo.replace("{layer}", f"{layer}")
+                            front_exo = front_exo.replace("{x}", f"{x}")
+                            front_exo = front_exo.replace("{y}", f"{y}")
+                            front_exo = front_exo.replace("{left}", f"{left}")
+                            front_exo = front_exo.replace("{right}", f"{right}")
+                            front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
+                            front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+
+                            output_exo += front_exo
+                            obj_id += 1
+                        
+                        continue
+
+                    front_exo = EXOTemplate.FRONT_CHAIN
+                    start = calc_frame_from_time(division_times[k], settings) + 1
+                    end = calc_frame_from_time(division_times[k + 1], settings)
+                    layer = 12 + display_row
+                    left = division_xs[k] // 1
+                    right = division_xs[k + 1] // 1
+
+                    front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
+                    front_exo = front_exo.replace("{start}", f"{start}")
+                    front_exo = front_exo.replace("{end}", f"{end}")
+                    front_exo = front_exo.replace("{layer}", f"{layer}")
+                    front_exo = front_exo.replace("{x}", f"{x}")
+                    front_exo = front_exo.replace("{y}", f"{y}")
+                    front_exo = front_exo.replace("{left}", f"{left}")
+                    front_exo = front_exo.replace("{right}", f"{right}")
+                    front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
+                    front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+
+                    output_exo += front_exo
+                    obj_id += 1
+
             else:
+                # ルビの文字単位でのワイプ定義がない or ワイプ速度調整無効の場合：等速でワイプ
                 front_exo = EXOTemplate.FRONT_CHAIN
                 start = calc_frame_from_time(dc["times"][j][0], settings) + 1
                 end = calc_frame_from_time(dc["times"][j + 1][0], settings)
