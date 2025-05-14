@@ -200,8 +200,9 @@ PS> .\venv\Scripts\Activate.ps1
 | `LYRIC.TEXT_WIDTH_MIN`                         | int(単位：ピクセル)                     | 最小文字幅                                        |
 | `LYRIC.Y_DRAW_OFFSET`                          | int(単位：ピクセル)                     | 文字描画時のY座標オフセット（フォントによるずれを補正）       |
 | `LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float(単位：秒)                       | タイムタグ間のワイプ速度を調整する秒数の閾値                |
-| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                               | ワイプＸ座標の始点・終点に対する相対分割リスト             |
-| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                               | ワイプ時間の始点・終点に対する相対分割リスト                |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float[]                             | ワイプＸ座標の始点・終点に対する相対分割リスト             |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float[]                             | ワイプ時間の始点・終点に対する相対分割リスト                |
+| `LYRIC.SYNC_WIPE_WITH_RUBY`                    | bool                                | ルビに文字ごとのワイプが定義されている場合に歌詞もワイプを同期する  |
 
 
 - ルビ字幕の設定`RUBY.XXX`
@@ -218,8 +219,8 @@ PS> .\venv\Scripts\Activate.ps1
 | `RUBY.TEXT_WIDTH_MIN`                          | int(単位：ピクセル)                     | 最小文字幅                                        |
 | `RUBY.Y_DRAW_OFFSET`                           | int(単位：ピクセル)                     | 文字描画時のY座標オフセット（フォントによるずれを補正）       |
 | `RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float(単位：秒)                       | タイムタグ間のワイプ速度を調整する秒数の閾値                |
-| `RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                               | ワイプＸ座標の始点・終点に対する相対分割リスト             |
-| `RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                               | ワイプ時間の始点・終点に対する相対分割リスト                |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float[]                             | ワイプＸ座標の始点・終点に対する相対分割リスト             |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float[]                             | ワイプ時間の始点・終点に対する相対分割リスト                |
 
 
 ### ADJUST_WIPE_SPEED_XXXパラメータの挙動について
