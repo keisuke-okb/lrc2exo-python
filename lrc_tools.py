@@ -188,7 +188,7 @@ def apply_rubies_to_result(result, ruby_defs):
                 if text in lyric:
                     if time_start < start:
                         continue
-                    if time_end >= end:
+                    if time_end > end:
                         continue
 
                     if text == lyric:
