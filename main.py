@@ -30,28 +30,72 @@ def run_generate_exo(
     output_dir = f"./output/{os.path.splitext(os.path.basename(input_lrc_path))[0]}/"
     os.makedirs(output_dir, exist_ok=True)
 
-    data = lrc_tools.parse_lrc_texts(open(input_lrc_path, "r", encoding=detect_encoding(input_lrc_path)).readlines())
+    lrc_org_data = open(input_lrc_path, "r", encoding=detect_encoding(input_lrc_path)).readlines()
+    is_extended_lrc = any(["@Ruby" in l for l in lrc_org_data])
+    data = lrc_tools.parse_lrc_texts(lrc_org_data)
 
-    for i, seg in enumerate(tqdm(data)):
-        d = text_tools.draw_lyric_image_with_ruby(
-            data=seg,
-            settings=settings,
-            output_path_1=os.path.join(output_dir, f"{i:04d}_1.png"),
-            output_path_2=os.path.join(output_dir, f"{i:04d}_2.png"),
+    # ルビ拡張規格LRCファイル向け
+    if is_extended_lrc:
+        lrc_tools.parse_complex_lyrics(
+            open(input_lrc_path, "r", encoding=detect_encoding(input_lrc_path)).readlines(),
+            "./tmp_ext.lrc"
         )
-        data[i] = d
+        data_r = lrc_tools.parse_lrc_texts(open("./tmp_ext.lrc", "r", encoding=detect_encoding(input_lrc_path)).readlines())
     
-    data = time_tools.calc_display_time(data, settings=settings)
+        for i, seg in enumerate(tqdm(data)):
+            d = text_tools.draw_lyric_image_with_ruby(
+                data=seg,
+                settings=settings,
+                output_path_1=os.path.join(output_dir, f"{i:04d}_1.png"),
+                output_path_2=os.path.join(output_dir, f"{i:04d}_2.png"),
+            )
+            data[i] = d
 
-    if json_output_path is not None:
-        with open(json_output_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+        for i, seg in enumerate(tqdm(data_r)):
+            d = text_tools.draw_lyric_image_with_ruby(
+                data=seg,
+                settings=settings,
+                output_path_1=os.path.join(output_dir, f"{i:04d}_1.png"),
+                output_path_2=os.path.join(output_dir, f"{i:04d}_2.png"),
+            )
+            data_r[i] = d
+        
+        data = time_tools.calc_display_time(data, settings=settings)
+        data_r = time_tools.calc_display_time(data_r, settings=settings)
 
-    output_exo = exo_tools.generate_exo(data, settings=settings)
+        if json_output_path is not None:
+            with open(json_output_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
 
-    os.makedirs(os.path.dirname(exo_output_path), exist_ok=True)
-    with open(exo_output_path, 'w', encoding="cp932") as f:
-        print(output_exo, file=f)
+        output_exo = exo_tools.generate_exo(data, data_r, settings=settings)
+
+        os.makedirs(os.path.dirname(exo_output_path), exist_ok=True)
+        with open(exo_output_path, 'w', encoding="cp932") as f:
+            print(output_exo, file=f)
+
+    
+    else:
+        for i, seg in enumerate(tqdm(data)):
+            d = text_tools.draw_lyric_image_with_ruby(
+                data=seg,
+                settings=settings,
+                output_path_1=os.path.join(output_dir, f"{i:04d}_1.png"),
+                output_path_2=os.path.join(output_dir, f"{i:04d}_2.png"),
+            )
+            data[i] = d
+
+        data = time_tools.calc_display_time(data, settings=settings)
+
+        if json_output_path is not None:
+            with open(json_output_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+
+        output_exo = exo_tools.generate_exo(data, data, settings=settings)
+
+        os.makedirs(os.path.dirname(exo_output_path), exist_ok=True)
+        with open(exo_output_path, 'w', encoding="cp932") as f:
+            print(output_exo, file=f)
+    
 
 def run_generate_exo_manually():
     run_generate_exo(

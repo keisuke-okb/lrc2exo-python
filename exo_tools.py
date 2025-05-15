@@ -27,7 +27,9 @@ def divide_segments(x_start, x_end, division_points):
     
     return x_coords
 
-def generate_exo(data, settings):
+def generate_exo(data, data_r, settings):
+    assert len(data) == len(data_r)
+
     # Output EXO
     output_exo = ""
     init_exo = EXOTemplate.INIT
@@ -38,7 +40,7 @@ def generate_exo(data, settings):
     output_exo += init_exo
     obj_id = 0
 
-    for i, dc in enumerate(data):
+    for i, (dc, dc_r) in enumerate(zip(data, data_r)):
 
         # back lyric
         back_exo = EXOTemplate.BACK
@@ -245,7 +247,7 @@ def generate_exo(data, settings):
 
         # back ruby
         back_exo = EXOTemplate.BACK
-        display_row = dc["display_row"]
+        display_row = dc_r["display_row"]
         if display_row == 0:
             y = settings.GENERAL.PROJECT_Y_0_RUBY
         elif display_row == 1:
@@ -256,9 +258,9 @@ def generate_exo(data, settings):
             y = settings.GENERAL.PROJECT_Y_3_RUBY
         
         layer = 8 + display_row
-        file = dc["image_2"]
-        start = calc_frame_from_time(dc["display_start_time"], settings) + 1
-        end = calc_frame_from_time(dc["display_end_time"], settings)
+        file = dc_r["image_2"]
+        start = calc_frame_from_time(dc_r["display_start_time"], settings) + 1
+        end = calc_frame_from_time(dc_r["display_end_time"], settings)
         clip_up = 0
         clip_bottom = settings.GENERAL.HEIGHT - (settings.GENERAL.Y_RUBY + settings.RUBY.FONT_SIZE + settings.RUBY.STROKE_WIDTH)
 
@@ -277,10 +279,10 @@ def generate_exo(data, settings):
 
         # Front ruby
         front_exo = EXOTemplate.FRONT
-        start = calc_frame_from_time(dc["display_start_time"], settings) + 1
-        end = calc_frame_from_time(dc["times"][0][0], settings)
+        start = calc_frame_from_time(dc_r["display_start_time"], settings) + 1
+        end = calc_frame_from_time(dc_r["times"][0][0], settings)
         layer = 16 + display_row
-        file = dc["image_1"]
+        file = dc_r["image_1"]
         clip_up = 0
         clip_bottom = settings.GENERAL.HEIGHT - (settings.GENERAL.Y_RUBY + settings.RUBY.FONT_SIZE + settings.RUBY.STROKE_WIDTH)
 
@@ -298,9 +300,9 @@ def generate_exo(data, settings):
         obj_id += 1
 
         _dc_ruby = {
-            "times": [x for sub in dc["times"] for x in sub],
-            "x_start_ruby": [x for sub in dc["x_start_ruby"] for x in sub],
-            "x_end_ruby": [x for sub in dc["x_end_ruby"] for x in sub],
+            "times": [x for sub in dc_r["times"] for x in sub],
+            "x_start_ruby": [x for sub in dc_r["x_start_ruby"] for x in sub],
+            "x_end_ruby": [x for sub in dc_r["x_end_ruby"] for x in sub],
         }
 
         # Front ruby chain
