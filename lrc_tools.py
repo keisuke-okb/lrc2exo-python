@@ -1,4 +1,16 @@
 import re
+import numpy as np
+from collections import OrderedDict
+
+# 正規表現コンパイル
+ruby_def_re = re.compile(
+    r'^@Ruby(?P<id>\d+)='                  # @RubyID=
+    r'(?P<text>[^,]+),'                    # text (カンマ以外)
+    r'(?P<ruby>[^,]+?)'                    # ruby (カンマ以外を最短マッチ)
+    r'(?:,(?P<start>(?:\[[0-9:.]+\])?))?'  # ,start フィールド（[hh:mm:ss] または空）
+    r'(?:,(?P<end>(?:\[[0-9:.]+\])?))?'    # ,end   フィールド（[hh:mm:ss] または空）
+    r'$'                                   # 行末
+)
 
 def time_tag_to_ms(time_tag):
     """
@@ -62,7 +74,12 @@ def parse_lrc(text):
     if len(_lyrics) == len(_times):
         _times.append(_times[-1])
     
-    return {"times": _times, "lyrics": _lyrics, "rubys": _rubys}
+    return {
+        "times": [[t] for t in _times],
+        "lyrics": [[l] for l in _lyrics],
+        "rubys": [[r] for r in _rubys]
+    }
+
 
 def split_list(lst, delimiter):
     """
@@ -86,6 +103,144 @@ def split_list(lst, delimiter):
     result.append(current)
     return result
 
+
+def parse_ruby_definitions(lines):
+    """
+    @Ruby1～N の順序を保持して、各定義を辞書に保存した OrderedDict を返す。
+    key: int(Ruby番号), value: dict(text, units, start, end)
+    """
+    rubies = []
+    for line in lines:
+        m = ruby_def_re.match(line.strip())
+        if not m:
+            continue
+        idx   = int(m.group('id'))
+        text  = m.group('text')
+        ruby  = m.group('ruby')
+        start = time_tag_to_ms(m.group('start')) if m.group('start') else time_tag_to_ms("[00:00:00]")
+        end   = time_tag_to_ms(m.group('end'))   if m.group('end')   else time_tag_to_ms("[99:59:99]")
+        
+        # ルビ部をタイムタグと文字で分割
+        parts = re.split(r'(\[[0-9:.]+\])', ruby)
+
+        texts = []
+        times = []
+        buf = ''
+
+        for p in parts:
+            if p.startswith('['):
+                if buf:
+                    texts.append(buf); buf = ''
+                times.append(time_tag_to_ms(p))
+
+            else:
+                buf += p
+        if buf:
+            texts.append(buf)
+        
+        rubies.append({'id': idx, 'text': text, 'div_texts': texts, 'div_times': times, 'start': start, 'end': end })
+    
+    return rubies
+
+
+def split_with_target(s: str, target: str) -> list[str]:
+    """
+    文字列 s の中で target にマッチする部分を境に分割し、
+    target 自身も要素として含むリストを返す。
+    """
+    # target を正規表現でエスケープし、キャプチャグループとして使う
+    pattern = f'({re.escape(target)})'
+    # split すると、キャプチャ部分もリストに残る
+    parts = re.split(pattern, s)
+    # 空文字を取り除いて返す
+    return [p for p in parts if p]
+
+def apply_rubies_to_result(result, ruby_defs):
+    """
+    result: list of parse_lrc_texts 出力
+    ruby_defs: OrderedDict from parse_ruby_definitions
+    各 @RubyN を順に適用し、start/end 範囲をチェックする
+    """
+    for entry in result:
+        assert all(k in entry for k in ('times', 'lyrics', 'rubys'))
+        times  = entry['times']   # List[List[int]]
+        lyrics = entry['lyrics']  # List[List[str]]
+        rubys  = entry['rubys']   # List[List[str]]
+
+        _times = []
+        _lyrics = []
+        _rubys = []
+
+        for idx_l, lyric_li in enumerate(lyrics):
+            lyric = lyric_li[0]
+            time_start = times[idx_l][0]
+            time_end = times[idx_l + 1][0]
+            _is_append = False
+
+            # ルビ定義番号順に適用
+            for idx, ruby in enumerate(ruby_defs):
+                text  = ruby['text']
+                div_texts = ruby['div_texts']
+                div_times = ruby['div_times']
+                start = ruby['start']
+                end   = ruby['end']
+
+                if text in lyric:
+                    if time_start < start:
+                        continue
+                    if time_end > end:
+                        continue
+
+                    if text == lyric:
+                        if len(div_times) > 0:
+                            _times.append([times[idx_l][0]] + [d + times[idx_l][0] for d in div_times])
+                        else:
+                            _times.append([times[idx_l][0]])
+                        _lyrics.append(lyric_li)
+                        _rubys.append(div_texts)
+                        _is_append = True
+                        # times[idx_l].extend([d + times[idx_l][0] for d in div_times])
+                        # rubys[idx_l] = div_texts
+
+                    else:
+                        _lyrics_spl = split_with_target(lyric, text)
+                        _is_t = False
+                        for _lyric in _lyrics_spl:
+                            if text == _lyric:
+                                if len(div_times) > 0:
+                                    _times.append([times[idx_l][0]] + [d + times[idx_l][0] for d in div_times])
+                                else:
+                                    _times.append([times[idx_l][0]])
+                                _lyrics.append([_lyric])
+                                _rubys.append(div_texts)
+                                _is_t = True
+
+                            else:
+                                if not _is_t:
+                                    _times.append([times[idx_l][0]])
+                                    _lyrics.append([_lyric])
+                                    _rubys.append([""])
+                                else:
+                                    _times.append([times[idx_l + 1][0]])
+                                    _lyrics.append([_lyric])
+                                    _rubys.append([""])
+                        
+                        _is_append = True
+                        
+                    break
+
+            if not _is_append: # Without ruby
+                _times.append([times[idx_l][0]])
+                _lyrics.append(lyric_li)
+                _rubys.append([""])
+        
+        _times.append(times[-1])
+        entry['times'] = _times
+        entry['lyrics'] = _lyrics
+        entry['rubys'] = _rubys
+    return result
+
+
 def parse_lrc_texts(lines):
     """
     複数行の歌詞データを解析し、各ブロックごとに時間・歌詞・ルビ情報を取得します。
@@ -101,14 +256,101 @@ def parse_lrc_texts(lines):
         - "block_current": ブロック内の現在の行番号。
         - "block_length": ブロック内の行数。
     """
-    lines = [l.strip() for l in lines if not "@" in l]
-    blocks = split_list(lines, "")
-    result = []
-    for block in blocks:
-        for i, line in enumerate(block):
-            lyric_dc = parse_lrc(line)
-            lyric_dc["block_current"] = i + 1
-            lyric_dc["block_length"] = len(block)
-            result.append(lyric_dc)
+    if not any(['@Ruby' in l.strip() for l in lines]):
+        # LRC without @RubyX annotations or ruby-inlined KRA
+        lines = [l.strip() for l in lines if not "@" in l]
+        blocks = split_list(lines, "")
+        result = []
+        for block in blocks:
+            for i, line in enumerate(block):
+                lyric_dc = parse_lrc(line)
+                lyric_dc["block_current"] = i + 1
+                lyric_dc["block_length"] = len(block)
+                result.append(lyric_dc)
 
-    return result
+        return result
+    
+    else:
+        # LRC with @RubyX annotations
+        ruby_defs = parse_ruby_definitions(lines)
+        
+        lyric_lines = [l.strip() for l in lines if not "@" in l]
+        blocks = split_list(lyric_lines, "")
+        result = []
+        for block in blocks:
+            for i, line in enumerate(block):
+                lyric_dc = parse_lrc(line)
+                lyric_dc["block_current"] = i + 1
+                lyric_dc["block_length"] = len(block)
+                result.append(lyric_dc)
+
+        return apply_rubies_to_result(result, ruby_defs)
+
+
+# ==== For complex lyrics ====
+
+def parse_ruby_definitions_2(lines):
+    ruby_defs = []
+    for line in lines:
+        if line.startswith('@Ruby'):
+            # Format: @RubyN=base,ruby,[start],[end]
+            _, rest = line.split('=', 1)
+            parts = rest.strip().split(',')
+            base = parts[0]
+            ruby_text = parts[1]
+            start = parts[2] if len(parts) > 2 and parts[2] else '00:00:00'
+            end = parts[3] if len(parts) > 3 and parts[3] else '99:59:99'
+            ruby_defs.append({
+                'base': base,
+                'ruby': ruby_text,
+                'start': start,
+                'end': end
+            })
+    return ruby_defs
+
+
+def process_line(line, ruby_defs):
+    # 同一タイムタグの重複を除去するユーティリティ
+    def collapse_tags(s):
+        return re.sub(r"(\[[0-9]{2}:[0-9]{2}:[0-9]{2}\])(?:\1)+", r"\1", s)
+
+    processed = line
+    for rd in ruby_defs:
+        base = rd['base']
+        # base の各文字前にタイムタグがあってもマッチ
+        pattern = ''.join(r'(?:\[[^\]]+\])*' + re.escape(ch) for ch in base)
+        regex = re.compile(pattern)
+
+        def repl(m):
+            span = m.group(0)
+            tags = re.findall(r'\[[^\]]+\]', span)
+            start_tag = tags[0] if tags else ''
+            rest = processed[m.end():]
+            m2 = re.search(r'\[[^\]]+\]', rest)
+            end_tag = m2.group(0) if m2 else ''
+            return f"{start_tag}{base}{end_tag}"
+
+        # 最初のひとつを置換
+        processed = regex.sub(repl, processed, count=1)
+    # 重複タグは collapse_tags でまとめる
+    processed = collapse_tags(processed)
+    return processed
+
+
+def parse_complex_lyrics(lines, output_file):
+    
+    ruby_defs = parse_ruby_definitions_2(lines)
+
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for line in lines:
+            # 改行文字を残したまま処理
+            if line.startswith('@Ruby'):
+                f.write(line)
+            else:
+                text = line.rstrip('\n')
+                # 空行はそのまま
+                if not text:
+                    f.write('\n')
+                else:
+                    processed = process_line(text, ruby_defs)
+                    f.write(processed + '\n')

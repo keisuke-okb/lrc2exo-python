@@ -27,7 +27,9 @@ def divide_segments(x_start, x_end, division_points):
     
     return x_coords
 
-def generate_exo(data, settings):
+def generate_exo(data, data_r, settings):
+    assert len(data) == len(data_r)
+
     # Output EXO
     output_exo = ""
     init_exo = EXOTemplate.INIT
@@ -38,7 +40,7 @@ def generate_exo(data, settings):
     output_exo += init_exo
     obj_id = 0
 
-    for i, dc in enumerate(data):
+    for i, (dc, dc_r) in enumerate(zip(data, data_r)):
 
         # back lyric
         back_exo = EXOTemplate.BACK
@@ -100,7 +102,7 @@ def generate_exo(data, settings):
         # Front lyric
         front_exo = EXOTemplate.FRONT
         start = calc_frame_from_time(dc["display_start_time"], settings) + 1
-        end = calc_frame_from_time(dc["times"][0], settings)
+        end = calc_frame_from_time(dc["times"][0][0], settings)
         layer = 12 + display_row
         file = dc["image_1"]
         clip_up = settings.GENERAL.Y_LYRIC - settings.LYRIC.STROKE_WIDTH
@@ -121,10 +123,13 @@ def generate_exo(data, settings):
 
         # Front lyric chain
         for j in range(len(dc["times"]) - 1):
-            delta_time_s = (dc["times"][j + 1] - dc["times"][j]) / 100
-            if delta_time_s >= settings.LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S:
-                division_times = divide_segments(dc["times"][j], dc["times"][j + 1], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES)
-                division_xs = divide_segments(dc["x_start_lyric"][j], dc["x_end_lyric"][j], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS)
+
+            delta_time_s = (dc["times"][j + 1][0] - dc["times"][j][0]) / 100
+            
+            if len(dc["times"][j]) == 1 and delta_time_s >= settings.LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S:
+                # ルビの文字単位でのワイプ定義がない and ワイプ速度有効の場合：設定に沿ってワイプ速度を変更
+                division_times = divide_segments(dc["times"][j][0], dc["times"][j + 1][0], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES)
+                division_xs = divide_segments(dc["x_start_lyric"][j][0], dc["x_end_lyric"][j][0], settings.LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS)
 
                 for k in range(len(division_times) - 1):
                     front_exo = EXOTemplate.FRONT_CHAIN
@@ -148,13 +153,83 @@ def generate_exo(data, settings):
                     output_exo += front_exo
                     obj_id += 1
 
+            elif len(dc["times"][j]) > 1 and settings.LYRIC.SYNC_WIPE_WITH_RUBY:
+                # ルビの文字単位でのワイプ定義がある and ルビ・歌詞のワイプ同期ONの場合：ルビのワイプに合わせて歌詞もワイプ
+
+                _time_deltas = [
+                    (dc["times"][j][k+1] if k+1 < len(dc["times"][j]) else dc["times"][j + 1][0]) - dc["times"][j][k]
+                    for k in range(len(dc["times"][j]))
+                ]
+                _x_deltas = [
+                    (dc["x_start_ruby"][j][k+1] if k+1 < len(dc["x_start_ruby"][j]) else dc["x_end_ruby"][j][-1]) - dc["x_start_ruby"][j][k]
+                    for k in range(len(dc["x_start_ruby"][j]))
+                ]
+
+                division_times = divide_segments(dc["times"][j][0], dc["times"][j + 1][0], _time_deltas)
+                division_xs = divide_segments(dc["x_start_lyric"][j][0], dc["x_end_lyric"][j][0], _x_deltas)
+
+                for k in range(len(division_times) - 1):
+
+                    _delta_time_s = (division_times[k + 1] - division_times[k]) / 100
+
+                    # ルビの文字でワイプ速度有効の場合は、歌詞のワイプもルビに合わせる
+                    if _delta_time_s >= settings.RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S:
+                        _division_times = divide_segments(division_times[k], division_times[k + 1], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES)
+                        _division_xs = divide_segments(division_xs[k], division_xs[k + 1], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS)
+                        
+                        for l in range(len(_division_times) - 1):
+                            front_exo = EXOTemplate.FRONT_CHAIN
+                            start = calc_frame_from_time(_division_times[l], settings) + 1
+                            end = calc_frame_from_time(_division_times[l + 1], settings)
+                            layer = 12 + display_row
+                            left = _division_xs[l] // 1
+                            right = _division_xs[l + 1] // 1
+
+                            front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
+                            front_exo = front_exo.replace("{start}", f"{start}")
+                            front_exo = front_exo.replace("{end}", f"{end}")
+                            front_exo = front_exo.replace("{layer}", f"{layer}")
+                            front_exo = front_exo.replace("{x}", f"{x}")
+                            front_exo = front_exo.replace("{y}", f"{y}")
+                            front_exo = front_exo.replace("{left}", f"{left}")
+                            front_exo = front_exo.replace("{right}", f"{right}")
+                            front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
+                            front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+
+                            output_exo += front_exo
+                            obj_id += 1
+                        
+                        continue
+
+                    front_exo = EXOTemplate.FRONT_CHAIN
+                    start = calc_frame_from_time(division_times[k], settings) + 1
+                    end = calc_frame_from_time(division_times[k + 1], settings)
+                    layer = 12 + display_row
+                    left = division_xs[k] // 1
+                    right = division_xs[k + 1] // 1
+
+                    front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
+                    front_exo = front_exo.replace("{start}", f"{start}")
+                    front_exo = front_exo.replace("{end}", f"{end}")
+                    front_exo = front_exo.replace("{layer}", f"{layer}")
+                    front_exo = front_exo.replace("{x}", f"{x}")
+                    front_exo = front_exo.replace("{y}", f"{y}")
+                    front_exo = front_exo.replace("{left}", f"{left}")
+                    front_exo = front_exo.replace("{right}", f"{right}")
+                    front_exo = front_exo.replace("{clip_up}", f"{clip_up}")
+                    front_exo = front_exo.replace("{clip_bottom}", f"{clip_bottom}")
+
+                    output_exo += front_exo
+                    obj_id += 1
+
             else:
+                # ルビの文字単位でのワイプ定義がない or ワイプ速度調整無効の場合：等速でワイプ
                 front_exo = EXOTemplate.FRONT_CHAIN
-                start = calc_frame_from_time(dc["times"][j], settings) + 1
-                end = calc_frame_from_time(dc["times"][j + 1], settings)
+                start = calc_frame_from_time(dc["times"][j][0], settings) + 1
+                end = calc_frame_from_time(dc["times"][j + 1][0], settings)
                 layer = 12 + display_row
-                left = dc["x_start_lyric"][j]
-                right = dc["x_end_lyric"][j]
+                left = dc["x_start_lyric"][j][0]
+                right = dc["x_end_lyric"][j][0]
 
                 front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
                 front_exo = front_exo.replace("{start}", f"{start}")
@@ -172,7 +247,7 @@ def generate_exo(data, settings):
 
         # back ruby
         back_exo = EXOTemplate.BACK
-        display_row = dc["display_row"]
+        display_row = dc_r["display_row"]
         if display_row == 0:
             y = settings.GENERAL.PROJECT_Y_0_RUBY
         elif display_row == 1:
@@ -183,9 +258,9 @@ def generate_exo(data, settings):
             y = settings.GENERAL.PROJECT_Y_3_RUBY
         
         layer = 8 + display_row
-        file = dc["image_2"]
-        start = calc_frame_from_time(dc["display_start_time"], settings) + 1
-        end = calc_frame_from_time(dc["display_end_time"], settings)
+        file = dc_r["image_2"]
+        start = calc_frame_from_time(dc_r["display_start_time"], settings) + 1
+        end = calc_frame_from_time(dc_r["display_end_time"], settings)
         clip_up = 0
         clip_bottom = settings.GENERAL.HEIGHT - (settings.GENERAL.Y_RUBY + settings.RUBY.FONT_SIZE + settings.RUBY.STROKE_WIDTH)
 
@@ -204,10 +279,10 @@ def generate_exo(data, settings):
 
         # Front ruby
         front_exo = EXOTemplate.FRONT
-        start = calc_frame_from_time(dc["display_start_time"], settings) + 1
-        end = calc_frame_from_time(dc["times"][0], settings)
+        start = calc_frame_from_time(dc_r["display_start_time"], settings) + 1
+        end = calc_frame_from_time(dc_r["times"][0][0], settings)
         layer = 16 + display_row
-        file = dc["image_1"]
+        file = dc_r["image_1"]
         clip_up = 0
         clip_bottom = settings.GENERAL.HEIGHT - (settings.GENERAL.Y_RUBY + settings.RUBY.FONT_SIZE + settings.RUBY.STROKE_WIDTH)
 
@@ -224,12 +299,18 @@ def generate_exo(data, settings):
         output_exo += front_exo
         obj_id += 1
 
+        _dc_ruby = {
+            "times": [x for sub in dc_r["times"] for x in sub],
+            "x_start_ruby": [x for sub in dc_r["x_start_ruby"] for x in sub],
+            "x_end_ruby": [x for sub in dc_r["x_end_ruby"] for x in sub],
+        }
+
         # Front ruby chain
-        for j in range(len(dc["times"]) - 1):
-            delta_time_s = (dc["times"][j + 1] - dc["times"][j]) / 100
+        for j in range(len(_dc_ruby["times"]) - 1):
+            delta_time_s = (_dc_ruby["times"][j + 1] - _dc_ruby["times"][j]) / 100
             if delta_time_s >= settings.RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S:
-                division_times = divide_segments(dc["times"][j], dc["times"][j + 1], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES)
-                division_xs = divide_segments(dc["x_start_ruby"][j], dc["x_end_ruby"][j], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS)
+                division_times = divide_segments(_dc_ruby["times"][j], _dc_ruby["times"][j + 1], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES)
+                division_xs = divide_segments(_dc_ruby["x_start_ruby"][j], _dc_ruby["x_end_ruby"][j], settings.RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS)
 
                 for k in range(len(division_times) - 1):
                     front_exo = EXOTemplate.FRONT_CHAIN
@@ -255,11 +336,11 @@ def generate_exo(data, settings):
             
             else:
                 front_exo = EXOTemplate.FRONT_CHAIN
-                start = calc_frame_from_time(dc["times"][j], settings) + 1
-                end = calc_frame_from_time(dc["times"][j + 1], settings)
+                start = calc_frame_from_time(_dc_ruby["times"][j], settings) + 1
+                end = calc_frame_from_time(_dc_ruby["times"][j + 1], settings)
                 layer = 16 + display_row
-                left = dc["x_start_ruby"][j]
-                right = dc["x_end_ruby"][j]
+                left = _dc_ruby["x_start_ruby"][j]
+                right = _dc_ruby["x_end_ruby"][j]
 
                 front_exo = front_exo.replace("{obj_id}", f"{obj_id}")
                 front_exo = front_exo.replace("{start}", f"{start}")

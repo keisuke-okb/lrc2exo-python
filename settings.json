@@ -88,7 +88,8 @@
         "Y_DRAW_OFFSET": 0,
         "ADJUST_WIPE_SPEED_THRESHOLD_S": 0.8,
         "ADJUST_WIPE_SPEED_DIVISION_POINTS": [2.5, 1.0, 1.0, 1.0],
-        "ADJUST_WIPE_SPEED_DIVISION_TIMES": [1.0, 1.5, 2.0, 1.5]
+        "ADJUST_WIPE_SPEED_DIVISION_TIMES": [1.0, 1.5, 2.0, 1.5],
+        "SYNC_WIPE_WITH_RUBY": true
     },
     
     "RUBY": {

@@ -77,7 +77,7 @@ def get_width_from_text(text, settings, mode="lyric", is_chorus=False):
     return {"bbox": bbox, "margin": margin, "width": _width}
 
 
-def draw_text_with_bbox(text, settings, mode="lyric", is_chorus=False, output_path=None):
+def draw_text_with_bbox(text_units, settings, mode="lyric", is_chorus=False, output_path=None):
     """文字列をバウンディングボックス付きで描画し、描画後の最終的なx座標を返します。"""
     if mode == "lyric":
         if is_chorus:
@@ -103,20 +103,28 @@ def draw_text_with_bbox(text, settings, mode="lyric", is_chorus=False, output_pa
     image = Image.new('RGBA', (settings.GENERAL.WIDTH, settings.GENERAL.HEIGHT), (255, 255, 255, 0))
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype(font_path, font_size)
+    _x_starts = []
+    _x_ends = []
 
-    for t in text:
-        _data = get_width_from_text(t, settings=settings, mode=mode, is_chorus=is_chorus)
-        _bbox = _data["bbox"]
-        _width = _data["width"]
-        _margin = _data["margin"]
-        draw.text((x_base - _bbox[0], 100), t, font=font, fill=(255, 255, 255, 255), stroke_width=stroke_size, stroke_fill=(0, 0, 0, 230))
-        x_base += _width + _margin
+    for text in text_units:
+        _x_starts.append(x_base)
+        _margin = 0
+
+        for t in text:
+            _data = get_width_from_text(t, settings=settings, mode=mode, is_chorus=is_chorus)
+            _bbox = _data["bbox"]
+            _width = _data["width"]
+            _margin = _data["margin"]
+            draw.text((x_base - _bbox[0], 100), t, font=font, fill=(255, 255, 255, 255), stroke_width=stroke_size, stroke_fill=(0, 0, 0, 230))
+            x_base += _width + _margin
+        
+        _x_ends.append(x_base - _margin)
 
     # Save the image
     if output_path is not None:
         image.save(output_path, 'PNG')
     
-    return x_base + stroke_size
+    return x_base + stroke_size, _x_starts, _x_ends
 
 COLOR_FILL_BEFORE_MAIN = None
 COLOR_STROKE_FILL_BEFORE_MAIN = None
@@ -164,29 +172,31 @@ def draw_lyric_image_with_ruby(data, settings, output_path_1="images/output_1.pn
     font_ruby = ImageFont.truetype(getattr(settings, ruby_cat).FONT_PATH, getattr(settings, ruby_cat).FONT_SIZE)
 
     x_base = settings.GENERAL.X_BASE_INIT
-
     x_start_lyric = []
     x_end_lyric = []
     x_start_ruby = []
     x_end_ruby = []
 
-    for i, (lyric, ruby) in enumerate(zip(data["lyrics"], data["rubys"])):
-        _width_lyric = draw_text_with_bbox(lyric, settings=settings, mode="lyric", is_chorus=IS_CHORUS)
-        _width_ruby = draw_text_with_bbox(ruby, settings=settings, mode="ruby", is_chorus=IS_CHORUS)
+    for i, (lyric_units, ruby_units) in enumerate(zip(data["lyrics"], data["rubys"])):
+        lyric = ''.join(lyric_units)
+        ruby = ''.join(ruby_units)
 
-        if lyric == " ":
-            x_start_lyric.append(x_end_lyric[-1])
-            x_start_ruby.append(x_end_ruby[-1])
+        _width_lyric, _, _ = draw_text_with_bbox(lyric_units, settings=settings, mode="lyric", is_chorus=IS_CHORUS)
+        _width_ruby, _xs_start_ruby, _xs_end_ruby = draw_text_with_bbox(ruby_units, settings=settings, mode="ruby", is_chorus=IS_CHORUS)
+
+        if lyric == " " and ruby == "":
+            x_start_lyric.append([x_end_lyric[-1][-1]])
+            x_start_ruby.append([x_end_ruby[-1][-1]])
             x_base += getattr(settings, lyric_cat).MARGIN_SPACE
-            x_end_lyric.append(int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH))
-            x_end_ruby.append(int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH))
+            x_end_lyric.append([int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH)])
+            x_end_ruby.append([int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH)])
             continue
 
         elif lyric == "":
-            x_start_lyric.append(int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH))
-            x_start_ruby.append(int(x_base - getattr(settings, ruby_cat).STROKE_WIDTH))
-            x_end_lyric.append(int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH))
-            x_end_ruby.append(int(x_base - getattr(settings, ruby_cat).STROKE_WIDTH))
+            x_start_lyric.append([int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH)])
+            x_start_ruby.append([int(x_base - getattr(settings, ruby_cat).STROKE_WIDTH)])
+            x_end_lyric.append([int(x_base - getattr(settings, lyric_cat).STROKE_WIDTH)])
+            x_end_ruby.append([int(x_base - getattr(settings, ruby_cat).STROKE_WIDTH)])
             continue
 
         if _width_lyric >= _width_ruby:
@@ -209,11 +219,11 @@ def draw_lyric_image_with_ruby(data, settings, output_path_1="images/output_1.pn
             # image_1.paste(resized_image, (_x_lyric + settings.GENERAL.PART_ICON_OFFSET_X, settings.GENERAL.Y_LYRIC + settings.GENERAL.PART_ICON_OFFSET_Y), resized_image)
             image_2.paste(resized_image, (_x_lyric + settings.GENERAL.PART_ICON_OFFSET_X, settings.GENERAL.Y_LYRIC + settings.GENERAL.PART_ICON_OFFSET_Y), resized_image)
 
-            x_start_lyric.append(int(_x_lyric))
-            x_start_ruby.append(int(_x_lyric))
+            x_start_lyric.append([int(_x_lyric)])
+            x_start_ruby.append([int(_x_lyric)])
             x_base = _x_lyric + new_width + settings.GENERAL.PART_ICON_MARGIN_X
-            x_end_lyric.append(int(_x_lyric + new_width))
-            x_end_ruby.append(int(_x_lyric + new_width))
+            x_end_lyric.append([int(_x_lyric + new_width)])
+            x_end_ruby.append([int(_x_lyric + new_width)])
 
             # change color
             COLOR_FILL_BEFORE_CURRENT = tuple(settings.GENERAL.COLOR_FILL_BEFORE_PART[idx])
@@ -223,7 +233,7 @@ def draw_lyric_image_with_ruby(data, settings, output_path_1="images/output_1.pn
             continue
 
         # draw lyric
-        x_start_lyric.append(int(_x_lyric - getattr(settings, lyric_cat).STROKE_WIDTH))
+        x_start_lyric.append([int(_x_lyric - getattr(settings, lyric_cat).STROKE_WIDTH)])
         _margin = 0
 
         for t in lyric:
@@ -247,10 +257,12 @@ def draw_lyric_image_with_ruby(data, settings, output_path_1="images/output_1.pn
             draw_2.text((_x_lyric - _bbox[0], settings.GENERAL.Y_LYRIC + getattr(settings, lyric_cat).Y_DRAW_OFFSET), t, font=font_lyric, fill=COLOR_FILL_AFTER_CURRENT, stroke_width=getattr(settings, lyric_cat).STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_AFTER_CURRENT)
             _x_lyric += _width + _margin
         
-        x_end_lyric.append(int(_x_lyric - _margin + getattr(settings, lyric_cat).STROKE_WIDTH))
+        x_end_lyric.append([int(_x_lyric - _margin + getattr(settings, lyric_cat).STROKE_WIDTH)])
 
         # draw ruby
-        x_start_ruby.append(int(_x_ruby - getattr(settings, ruby_cat).STROKE_WIDTH))
+        _x_start = int(_x_ruby - getattr(settings, ruby_cat).STROKE_WIDTH)
+        _x_start_offset = _x_start - _xs_start_ruby[0]
+        x_start_ruby.append([int(_x + _x_start_offset) for _x in _xs_start_ruby])
         _margin = 0
         for t in ruby:
             _data = get_width_from_text(t, settings=settings, mode="ruby", is_chorus=IS_CHORUS)
@@ -261,7 +273,9 @@ def draw_lyric_image_with_ruby(data, settings, output_path_1="images/output_1.pn
             draw_2.text((_x_ruby - _bbox[0], settings.GENERAL.Y_RUBY + getattr(settings, ruby_cat).Y_DRAW_OFFSET), t, font=font_ruby, fill=COLOR_FILL_AFTER_CURRENT, stroke_width=getattr(settings, ruby_cat).STROKE_WIDTH, stroke_fill=COLOR_STROKE_FILL_AFTER_CURRENT)
             _x_ruby += _width + _margin
 
-        x_end_ruby.append(int(_x_ruby - _margin + getattr(settings, ruby_cat).STROKE_WIDTH))
+        _x_end = int(_x_ruby - _margin + getattr(settings, ruby_cat).STROKE_WIDTH)
+        _x_end_offset = _x_end - _xs_end_ruby[-1]
+        x_end_ruby.append([int(_x + _x_end_offset) for _x in _xs_end_ruby])
 
         if _width_lyric >= _width_ruby:
             x_base = _x_lyric
@@ -286,7 +300,7 @@ def draw_lyric_image_with_ruby(data, settings, output_path_1="images/output_1.pn
     data["x_end_lyric"] = x_end_lyric
     data["x_start_ruby"] = x_start_ruby
     data["x_end_ruby"] = x_end_ruby
-    data["x_length"] = x_end_lyric[-1] + settings.GENERAL.X_BASE_INIT if x_end_lyric[-1] > x_end_ruby[-1] else x_end_ruby[-1] + settings.GENERAL.X_BASE_INIT
+    data["x_length"] = x_end_lyric[-1][-1] + settings.GENERAL.X_BASE_INIT if x_end_lyric[-1][-1] > x_end_ruby[-1][-1] else x_end_ruby[-1][-1] + settings.GENERAL.X_BASE_INIT
     data["image_1"] = os.path.abspath(output_path_1)
     data["image_2"] = os.path.abspath(output_path_2)
     return data

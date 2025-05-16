@@ -34,7 +34,7 @@ Software that creates karaoke subtitles for AviUtl from LRC/KRA lyric files with
 - Provides various output settings for subtitle images, including adjustments for character spacing in lyrics and ruby, outline width, etc.
 - Offers EXO object settings such as display time for the start of singing and subtitle duration.
 
-# Tutorial Using Sample Files
+# Tutorial Using Sample Files (KRA)
 
 1. Check the contents of `sample/1_シャイニングスター（出典：魔王魂）.kra` (exported using the time-tagged lyric creation software "RhythmicaLyrics") from the sample plain lyric file `sample/1_シャイニングスター（出典：魔王魂）.txt`.
 
@@ -74,9 +74,9 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
 1. **Prepare a Plain Lyric File**  
    - Using `sample/1_シャイニングスター（出典：魔王魂）.txt` as a reference, create a lyric file where each block contains up to 4 lines and blank lines act as delimiters between blocks.
 
-2. **Export a KRA File Using a Time-Tagging Software**  
+2. **Export a LRC or KRA File Using a Time-Tagging Software**  
    - Use software such as "[RhythmicaLyrics](https://suwa.pupu.jp/RhythmicaLyrics.html)" to save your time-tagged lyric file as an LRC or KRA file.  
-     In the case of [RhythmicaLyrics](https://suwa.pupu.jp/RhythmicaLyrics.html), it supports the output format for ruby-annotated lyrics intended for txt2ass.
+     In the case of [RhythmicaLyrics](https://suwa.pupu.jp/RhythmicaLyrics.html), it supports the output format for ruby-annotated lyrics for txt2ass (.kra) and ruby-extended lrc format (.lrc).
 
 3. **Prepare the Font File and settings.json**  
    - Copy the font file you wish to use for the karaoke subtitles along with the provided `settings.json`, and then customize the settings.
@@ -174,8 +174,9 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
 | `LYRIC.TEXT_WIDTH_MIN`     | int (unit: pixels)          | Minimum text width                                               |
 | `LYRIC.Y_DRAW_OFFSET`      | int (unit: pixels)          | Y-axis offset when drawing text (compensates for font differences) |
 | `LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float (unit: seconds)      | Threshold for adjusting wipe speed between time tags |
-| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                      | Relative division list for the start and end of the wipe X coordinate |
-| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                      | Relative division list for the start and end of the wipe duration |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float[]                    | Relative division list for the start and end of the wipe X coordinate |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float[]                    | Relative division list for the start and end of the wipe duration |
+| `LYRIC.SYNC_WIPE_WITH_RUBY`                    | bool                                | Whether to synchronize the lyrics wipe with the ruby wipe when a per-character/sub-block wipe is defined for the ruby  |
 
 
 ---
@@ -193,8 +194,8 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
 | `RUBY.TEXT_WIDTH_MIN`      | int (unit: pixels)          | Minimum text width                                               |
 | `RUBY.Y_DRAW_OFFSET`       | int (unit: pixels)          | Y-axis offset when drawing text (compensates for font differences) |
 | `RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float (unit: seconds)        | Threshold for adjusting wipe speed between time tags |
-| `RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                        | Relative division list for the start and end of the wipe X coordinate |
-| `RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                        | Relative division list for the start and end of the wipe duration |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float[]                      | Relative division list for the start and end of the wipe X coordinate |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float[]                      | Relative division list for the start and end of the wipe duration |
 
 
 ### Behavior of ADJUST_WIPE_SPEED_XXX Parameters

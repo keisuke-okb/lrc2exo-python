@@ -4,9 +4,15 @@
 
 # LRC2EXO-Python
 
+**最新リリースのダウンロードはこちらから**：https://github.com/keisuke-okb/lrc2exo-python/releases
+
 ![イメージ画像](./images/LRC2EXO-Python.jpg)
 
 LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕を作成するソフトウェア
+
+- 対応歌詞ファイル
+  - ルビ拡張規格LRCファイル【工事中・暫定対応】
+  - txt2ass向けKRAファイル
 
 - ソフトウェアの利用方法は順次アップデートいたします。
 
@@ -20,7 +26,7 @@ LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕�
 ## ソフトウェア概要
 
 ### 特徴
-- カラオケ字幕ファイル（LRC、txt2ass向けルビ付きKRAに対応）から、AviUtlで編集ができるカラオケ字幕を生成します。
+- カラオケ字幕ファイル（シンプルなLRC、ルビ拡張規格LRC、txt2ass向けルビ付きKRAに対応）から、AviUtlで編集ができるカラオケ字幕を生成します。
 - 字幕はテキストオブジェクトではなく画像であらかじめ書き出します。生成した後で画像編集ができるので、動画編集ソフト単体ではできない字幕表現を行うことができます。
 - 歌詞ファイル＋設定ファイルを用意することで多彩な字幕表現を可能にします。
 - **タイムタグ付き歌詞に「①」「①②」などの番号を入れておくことで、自動的にパート分け字幕を作ることができます。**
@@ -37,7 +43,29 @@ LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕�
 - 歌いだし表示時間、字幕残存時間などのEXOのオブジェクト設定
 - ロングトーン等でのゆっくりとしたワイプの際、ワイプ速度を調整する機能（`ADJUST_WIPE_SPEED_XXX`パラメータ）
 
-# サンプルファイルを使ったチュートリアル
+## 環境構築手順
+
+- 本ソフトウェアはPython環境を用いて処理を行います。以下の手順に沿って実行環境を作成してください。
+  - 推奨Pythonバージョン：3.10, 3.11
+
+### 1. 仮想環境作成
+
+- PowerShellで以下のコマンドを実行してください。
+
+```powershell
+PS> git clone https://github.com/keisuke-okb/lrc2exo-python
+PS> cd lrc2exo-python
+PS> python -m venv venv
+PS> .\venv\Scripts\Activate.ps1
+```
+
+### 2. ライブラリのインストール
+
+```powershell
+(venv) PS> pip install -r requirements.txt
+```
+
+# サンプルファイルを使ったチュートリアル（txt2ass向けKRA）
 
 1. サンプルのプレーンな歌詞ファイル`sample/1_シャイニングスター（出典：魔王魂）.txt`を、タイムタグ歌詞作成ソフト「RhythmicaLyrics」を使って書き出した`sample/1_シャイニングスター（出典：魔王魂）.kra`の中身を確認します。
 
@@ -58,8 +86,8 @@ LRC/KRA歌詞ファイル（ルビ付き）からAviUtl向けカラオケ字幕�
 3. `settings.json`を開き、"LYRIC">"FONT_PATH"、"RUBY">"FONT_PATH"にフォントファイルのパスを設定し保存します。
 4. ターミナルでこのリポジトリのディレクトリに移動し、以下のコマンドを実行すると字幕の生成を開始します。
 
-```shell
-python main.py --input_lrc_path "./sample/2_シャイニングスター（出典：魔王魂）.kra" --exo_output_path "./sample/2_シャイニングスター（出典：魔王魂）.exo"
+```powershell
+(venv) PS> python main.py --input_lrc_path "./sample/2_シャイニングスター（出典：魔王魂）.kra" --exo_output_path "./sample/2_シャイニングスター（出典：魔王魂）.exo"
 ```
 
 - または、`python main_gui.py`を実行し、GUIアプリでファイルパスを指定して生成処理を実行してください。
@@ -76,17 +104,18 @@ python main.py --input_lrc_path "./sample/2_シャイニングスター（出典
 
 1. プレーンな歌詞ファイルを用意する
     - `sample/1_シャイニングスター（出典：魔王魂）.txt`を参考に、最大４行を１ブロック、空白行を区切りとして歌詞ファイルを用意してください。
-2. タイムタグ作成ソフトを使ってKRAファイルを書き出す
+2. タイムタグ作成ソフトを使ってLRC・KRAファイルを書き出す
     - 「RhythmicaLyrics」などのソフトウェアを使いタイムタグを付けた歌詞ファイルをLRCまたはKRAファイルとして保存してください。
-    RhythmicaLyricsの場合、「txt2ass向け」のルビ付き歌詞の出力形式に対応しています。
+    - KRAファイルを書き出す場合、RhythmicaLyricsの「出力」から「txt2ass向け」のものを選択してください。
+    - LRCファイルを書き出す場合、RhythmicaLyricsの「出力」から「ルビ拡張規格」のものを選択してください。
 3. フォントファイル、settings.jsonの準備
     - カラオケ字幕に使用したいフォントと、付属の`settings.json`をコピーし設定をカスタマイズしてください。
 4. LRC2EXO-Pythonを使用してカラオケ字幕生成
     - 以下のコマンドを実行し、字幕生成を実行してください。
     - または、`python main_gui.py`を実行し、GUIアプリでファイルパスを指定して生成処理を実行してください。
 
-```shell
-python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルのパス＞" --exo_output_path "＜書き出したいEXOファイルのパス＞" --settings_path "＜手順3で用意した設定ファイルのパス＞"
+```powershell
+(venv) PS> python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルのパス＞" --exo_output_path "＜書き出したいEXOファイルのパス＞" --settings_path "＜手順3で用意した設定ファイルのパス＞"
 ```
 
 5. AviUtlで編集
@@ -171,8 +200,9 @@ python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルの�
 | `LYRIC.TEXT_WIDTH_MIN`                         | int(単位：ピクセル)                     | 最小文字幅                                        |
 | `LYRIC.Y_DRAW_OFFSET`                          | int(単位：ピクセル)                     | 文字描画時のY座標オフセット（フォントによるずれを補正）       |
 | `LYRIC.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float(単位：秒)                       | タイムタグ間のワイプ速度を調整する秒数の閾値                |
-| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                               | ワイプＸ座標の始点・終点に対する相対分割リスト             |
-| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                               | ワイプ時間の始点・終点に対する相対分割リスト                |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float[]                             | ワイプＸ座標の始点・終点に対する相対分割リスト             |
+| `LYRIC.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float[]                             | ワイプ時間の始点・終点に対する相対分割リスト                |
+| `LYRIC.SYNC_WIPE_WITH_RUBY`                    | bool                                | ルビに文字ごとのワイプが定義されている場合に歌詞もワイプを同期する  |
 
 
 - ルビ字幕の設定`RUBY.XXX`
@@ -189,8 +219,8 @@ python main.py --input_lrc_path "＜タイムタグ付き歌詞ファイルの�
 | `RUBY.TEXT_WIDTH_MIN`                          | int(単位：ピクセル)                     | 最小文字幅                                        |
 | `RUBY.Y_DRAW_OFFSET`                           | int(単位：ピクセル)                     | 文字描画時のY座標オフセット（フォントによるずれを補正）       |
 | `RUBY.ADJUST_WIPE_SPEED_THRESHOLD_S`          | float(単位：秒)                       | タイムタグ間のワイプ速度を調整する秒数の閾値                |
-| `RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float                               | ワイプＸ座標の始点・終点に対する相対分割リスト             |
-| `RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float                               | ワイプ時間の始点・終点に対する相対分割リスト                |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_POINTS`      | float[]                             | ワイプＸ座標の始点・終点に対する相対分割リスト             |
+| `RUBY.ADJUST_WIPE_SPEED_DIVISION_TIMES`       | float[]                             | ワイプ時間の始点・終点に対する相対分割リスト                |
 
 
 ### ADJUST_WIPE_SPEED_XXXパラメータの挙動について
