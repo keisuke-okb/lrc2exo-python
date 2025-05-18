@@ -298,10 +298,10 @@ def parse_ruby_definitions_2(lines):
             parts = rest.strip().split(',')
             base = parts[0]
             ruby_text = parts[1]
-            start = parts[2] if len(parts) > 2 and parts[2] else '00:00:00'
-            end = parts[3] if len(parts) > 3 and parts[3] else '99:59:99'
+            start = parts[2] if len(parts) > 2 and parts[2] else '[00:00:00]'
+            end = parts[3] if len(parts) > 3 and parts[3] else '[99:59:99]'
             ruby_defs.append({
-                'base': base,
+                'lyric': base,
                 'ruby': ruby_text,
                 'start': start,
                 'end': end
@@ -309,32 +309,188 @@ def parse_ruby_definitions_2(lines):
     return ruby_defs
 
 
+def parse_time(tag):
+    m, s, f = map(int, tag.strip('[]').split(':'))
+    return (m, s, f)
+
+
+def tokenize(line):
+    """
+    1行のタイムタグ付き歌詞をパースし、1文字ずつの辞書リスト（token_dc）を返す。
+
+    Args:
+        line (str): 1行のタイムタグ付き歌詞文字列
+
+    Returns:
+        token_dc (list of dict): 
+        各要素が {"lyric":…, "start":…, "end":…} の辞書で構成されるリスト
+    """
+    # 返却用リスト
+    token_dc = []
+
+    # タイムタグの正規表現
+    tag_pattern = r'\[\d{2}:\d{2}:\d{2}\]'
+
+    # 1) 行からタグをすべて検出
+    tag_matches = list(re.finditer(tag_pattern, line))
+    if not tag_matches:
+        # タグが1つも無い場合は空リストを返す
+        return token_dc
+
+    # 1a) 最初と最後のタグ以外の部分をトリム
+    first_tag_start = tag_matches[0].start()
+    last_tag_end   = tag_matches[-1].end()
+    trimmed = line[first_tag_start:last_tag_end]
+
+    # 2) 連続するタグの間に ▨ を挿入（例: "[...][...]" → "[…]▨[…] "）
+    trimmed = re.sub(r'\]\[', ']▨[', trimmed)
+
+    # 3) タグと歌詞（または▨）が交互になるように分割
+    parts = re.split('(' + tag_pattern + ')', trimmed)
+    # 例: ["", "[00:27:79]", "Be ", "[00:28:15]", "mine ", ... ]
+
+    # parts の奇数インデックスがタイムタグ、次の偶数インデックスがその後の歌詞文字列
+    num_parts = len(parts)
+    for i in range(1, num_parts, 2):
+        current_tag = parts[i]                    # 例: "[00:27:79]"
+        lyrics = parts[i+1] if (i+1) < num_parts else ""    # タグ直後の文字列 (歌詞 or "▨")
+        next_tag = parts[i+2] if (i+2) < num_parts else None # 次のタイムタグ (なければ None)
+
+        # 歌詞部分が空文字の場合は無視
+        if lyrics == "":
+            continue
+
+        # 4) 歌詞部分を1文字ずつ辞書化
+        L = len(lyrics)
+        for j, ch in enumerate(lyrics):
+            if L == 1:
+                # 文字が1つだけなら start=current_tag, end=next_tag
+                d = {
+                    "lyric": ch,
+                    "start": current_tag,
+                    "end": next_tag or ""
+                }
+            else:
+                # 複数文字の場合
+                if j == 0:
+                    # 先頭文字 → start=current_tag, end=""
+                    d = {
+                        "lyric": ch,
+                        "start": current_tag,
+                        "end": ""
+                    }
+                elif j == L-1:
+                    # 最後文字 → start="", end=next_tag
+                    d = {
+                        "lyric": ch,
+                        "start": "",
+                        "end": next_tag or ""
+                    }
+                else:
+                    # 中間文字 → start="", end=""
+                    d = {
+                        "lyric": ch,
+                        "start": "",
+                        "end": ""
+                    }
+            token_dc.append(d)
+
+    # 5) 最後の辞書要素に必ず end があることを検証
+    if token_dc and token_dc[-1].get("end", "") == "":
+        raise ValueError(f"行末の要素に end タイムタグがありません: '{line}'")
+
+    return token_dc
+
+
+def find_all_ranges(lyric: str, target: str):
+    results = []
+    start_pos = 0
+
+    while True:
+        idx = lyric.find(target, start_pos)
+        if idx == -1:
+            break
+        # 終了インデックスは「開始 + len(target) - 1」
+        end_idx = idx + len(target) - 1
+        results.append((idx, end_idx))
+        # 次の検索は「現在の idx + 1 以降」から
+        start_pos = idx + len(target)
+
+    return results
+
+
+def adjust_ruby(tokens_dcs, ruby_defs):
+    lyrics = "".join([dc['lyric'] for dc in tokens_dcs])
+
+    for i, ruby_def in enumerate(ruby_defs):
+        _target_lyric = ruby_def['lyric']
+        _target_start = ruby_def['start']
+        _target_end = ruby_def['end']
+
+        _matches = find_all_ranges(lyrics, _target_lyric)
+
+        for _match in _matches:
+            start_idx, end_idx = _match[0], _match[1]
+
+            # 開始タイムタグを検索
+            _idx = start_idx
+            while not tokens_dcs[_idx]["start"]:
+                _idx -= 1
+            start = tokens_dcs[_idx]["start"]
+            # 終了タイムタグを検索
+            _idx = end_idx
+            while not tokens_dcs[_idx]["end"]:
+                _idx += 1
+            end = tokens_dcs[_idx]["end"]
+
+            if parse_time(_target_start) <= parse_time(start) and \
+                parse_time(end) <= parse_time(_target_end):
+                # ルビの定義に一致する
+                if not tokens_dcs[start_idx]["start"]:
+                    tokens_dcs[start_idx - 1]["end"] = start
+                    tokens_dcs[start_idx]["start"] = start
+                
+                if not tokens_dcs[end_idx]["end"]:
+                    tokens_dcs[end_idx]["end"] = end
+                    tokens_dcs[end_idx + 1]["start"] = end
+
+                # 間のタイムタグは除去
+                for _idx in range(start_idx, end_idx):
+                    if tokens_dcs[_idx]["end"]:
+                        tokens_dcs[_idx]["end"] = ""
+                        tokens_dcs[_idx + 1]["start"] = ""
+            
+            else:
+                continue
+
+    return tokens_dcs
+
+
+def detokenize(tokens_dcs):
+    line = ""
+    for i, tokens_dc in enumerate(tokens_dcs):
+        if tokens_dc['start']:
+            line += tokens_dc['start']
+            line += tokens_dc['lyric']
+
+        else:
+            line += tokens_dc['lyric']
+        
+        if i == len(tokens_dcs) - 1:
+            line += tokens_dc['end']
+
+    return line.replace("▨", "")
+
+
 def process_line(line, ruby_defs):
-    # 同一タイムタグの重複を除去するユーティリティ
-    def collapse_tags(s):
-        return re.sub(r"(\[[0-9]{2}:[0-9]{2}:[0-9]{2}\])(?:\1)+", r"\1", s)
+    # 各行を歌詞1文字ずつ辞書化
+    tokens_dcs = tokenize(line)
+    tokens_dcs = adjust_ruby(tokens_dcs, ruby_defs)
+    return detokenize(tokens_dcs)
 
-    processed = line
-    for rd in ruby_defs:
-        base = rd['base']
-        # base の各文字前にタイムタグがあってもマッチ
-        pattern = ''.join(r'(?:\[[^\]]+\])*' + re.escape(ch) for ch in base)
-        regex = re.compile(pattern)
 
-        def repl(m):
-            span = m.group(0)
-            tags = re.findall(r'\[[^\]]+\]', span)
-            start_tag = tags[0] if tags else ''
-            rest = processed[m.end():]
-            m2 = re.search(r'\[[^\]]+\]', rest)
-            end_tag = m2.group(0) if m2 else ''
-            return f"{start_tag}{base}{end_tag}"
-
-        # 最初のひとつを置換
-        processed = regex.sub(repl, processed, count=1)
-    # 重複タグは collapse_tags でまとめる
-    processed = collapse_tags(processed)
-    return processed
+def process_lines(lines, ruby_defs):
+    return [process_line(line, ruby_defs) for line in lines]
 
 
 def parse_complex_lyrics(lines, output_file):
